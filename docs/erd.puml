@@ -1,0 +1,134 @@
+@startuml erd
+
+entity User {
+    * user_id VARCHAR (255) <<PK>>
+    --
+    * no_telepon VARCHAR (13)
+    * password VARCHAR (255)
+    * username VARCHAR (30)
+    * last_updated_username DATETIME 
+    --
+    * name VARCHAR (200) <<UNI>>
+    * email VARCHAR (200)
+    * photo_profile VARCHAR (200)
+    * bio TEXT
+    * gender ENUM
+    * status_member ENUM
+    * birth_date DATETIME
+    * created_at TIMESTAMP
+    * token VARCHAR (255)
+    * token_expired_at BIGINT
+
+}
+
+entity Store {
+    * store_id VARCHAR (255) <<PK>>
+    * user_id VARCHAR (255) <<FK>>
+    --
+    * name VARCHAR (255) <<UNI>>
+    * last_updated_name (255) BIGINT
+    * logo VARCHAR (200)
+    * description TEXT
+    * status ENUM
+    * link_store VARCHAR (100)
+    * total_comment INT (4)
+    * total_following INT (4)
+    * total_follower INT (4)
+    * total_product INT (4)
+    * condition VARCHAR (200)
+    * created_at TIMESTAMP
+}
+
+entity Product {
+    * product_id BIGINT <<PK>>
+    * store_id VARCHAR (255) <<FK>>
+    --
+    * photo_product VARCHAR (255)
+    * name VARCHAR (255)
+    * category VARCHAR (255)
+    * description TEXT
+    * dangerius_product ENUM
+    * price DECIMAL(15, 2)
+    * stock INT (8)
+    * wholesaler VARCHAR (200)
+    * shipping_cost DECIMAL (15, 2)
+    * shipping_insurance VARCHAR (200)
+    * condition ENUM
+    * pre_order VARCHAR (200)
+    * status VARCHAR (200)
+    * created_at TIMESTAMP
+    * last_updated_at DATETIME
+}
+
+entity Order {
+    * order_id VARCHAR (200) <<PK>>
+    * user_id VARCHAR (200) <<FK>>
+    --
+    * order_date DATETIME
+    * order_complition_date DATETIME
+    * order_status INT (2)
+    * shipping_address TEXT
+    * shipping_method VARCHAR
+    * payment_method VARCHAR
+    * total_amount DECIMAL (15, 2)
+}
+
+
+entity Order_detail {
+    * order_detai_id VARCHAR (255) <<PK>>
+    * order_id VARCHAR (255) <<FK>>
+    * product_id BIGINT <<FK>>
+    --
+    * quantity INT (5)
+    * unit_price DECIMAL (15, 2)
+    * total_price DECIMAL (15, 2)
+}
+
+entity Transaction {
+    * transaction_id VARCHAR (255) <<PK>>
+    * order_id VARCHAR (255) <<FK>>
+    --
+    * transaction_date DATETIME
+    * amount INT (5)
+    * payment_status INT (2)
+    * payment_method VARCHAR (255)
+}
+
+entity Shipping {
+    * shipping_id VARCHAR (255) <<PK>>
+    * order_id VARCHAR (255) <<FK>>
+    --
+    * shipping_method VARCHAR (255)
+    * kurir VARCHAR (255)
+}
+
+entity Shipping_detail {
+    * shipping_detail_id VARCHAR (255) <<PK>>
+    * shipping_id VARCHAR (255) <<FK>>
+    * track VARCHAR (255)
+    * time_track DATETIME
+}
+
+entity Buyer_payment {
+    * buyer_payment_id VARCHAR (255) <<PK>>
+    * order_id VARCHAR (255) <<FK>>
+    --
+    * shipping_cost DECIMAL (15, 2)
+    * shopee_voucher DECIMAL (15, 2)
+    * store_voucher DECIMAL (15, 2)
+    * shopee_coin DECIMAL (15, 2)
+    * credit_card_promo DECIMAL (15, 2)
+    * service_fee DECIMAL (15, 2)
+    * transaction_cost DECIMAL (15, 2)
+}
+
+User ||--|| Store
+Store ||--o Product
+User ||--|| Order
+Order ||--o Order_detail
+Order ||--|| Transaction
+Order ||--|| Shipping
+Order ||--|| Buyer_payment
+Shipping ||--|| Shipping_detail
+
+@enduml

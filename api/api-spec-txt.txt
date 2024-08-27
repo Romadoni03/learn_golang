@@ -1,0 +1,58 @@
+api spec // endpoint
+
+User :
+
+POST /api/users => Register
+POST /api/users/login => Login
+DELETE /api/users/logout => logout
+--
+GET /api/users/profile => halaman user profile
+PATCH /api/users/profile => edit profile user
+DELETE /api/users/profile => Delete akun User
+--
+GET /api/users/purchase => mendapatkan info pesanan
+
+Store :
+
+POST /api/stores => Membuat Toko
+GET /api/stores/profile => get store by user
+PATCH /api/stores/profile => Edit profile Store
+DELETE /api/stores/ => Remove Store
+
+Product :
+
+POST /api/stores/products => Add Product
+GET  /api/stores/products => Get all product
+GET /api/stores/products/:productId => Get detail product
+PATCH /api/stores/products/:productId => Edit info product
+DELETE /api/stores/products/:productId => Remove Product
+
+Order :
+
+POST /api/orders => membuat order baru
+GET /api/orders/:id => get info order
+PATCH /api/orders/:id => update info order
+
+Rincian Pembayaran :
+
+GET /api/orders/:orderId/income => melihat detail Rincian penghasilan seller
+GET /api/orders/:orderId/buyerPayment => melihat detail Rincian pembayaran pembeli
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

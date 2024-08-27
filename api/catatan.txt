@@ -1,0 +1,8 @@
+catatan :
+
+1. untuk sekarang user register hanya metode no hp dan input password biasa, kedepanya ada fitur via email, oauth2 ( google ), send kode otp to WA
+2. Sekarang token masih generate random, selanjutkan akan menggunakan JWT
+3. halaman puchase belum ada detailnya, next ditambah api untuk detailnya
+4. untuk api product yang get untuk kedepanya akan menggunakan pagination,
+5. untuk product hanya masih 1 foto, selantunya bisa upload max 4 foto
+6. endpoint untuk order dll ( yang advance) menyusul

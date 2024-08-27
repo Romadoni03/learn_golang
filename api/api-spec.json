@@ -1,0 +1,951 @@
+{
+    "openapi" : "3.0.3",
+    "info": {
+        "title": "API Spec Doc",
+        "description": "Learning golang with Project Based Learning",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8008/api"
+        }
+    ],
+    "paths": {
+        "/users": {
+            "post": {
+                "tags": ["User API"],
+                "description": "Create new account user",
+                "summary": "Create new account user",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "no_telepon": {
+                                        "type": "string"
+                                    },
+                                    "password": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success add new user",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "number"
+                                        },
+                                        "status": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "message": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/login": {
+            "post": {
+                "tags": ["User API"],
+                "description": "used to user login",
+                "summary": "To user login",
+                "requestBody" :{
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "no_telepon": {
+                                        "type": "string"
+                                    },
+                                    "password": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success login",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "number"
+                                        },
+                                        "status": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "username": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "token": {
+                                                    "type": "string"
+                                                },
+                                                "token_expired_at": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/logout": {
+            "delete": {
+                "tags": ["User API"],
+                "description": "used to logout",
+                "summary": "used to logout",
+                "security": [{
+                    "UserAuth": []
+                }],
+                "responses": {
+                    "200": {
+                        "description": "Success logout",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "number"
+                                        },
+                                        "status": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "message": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/profile": {
+            "get": {
+                "tags": ["User API"],
+                "description": "used get user info",
+                "summary": "used get user info",
+                "security": [{
+                    "UserAuth": []
+                }],
+                "responses": {
+                    "200": {
+                        "description": "Success get user info by token",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "number"
+                                        },
+                                        "status": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/getUpdateUserProfile"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "tags": ["User API"],
+                "description": "used update user info",
+                "summary": "used update user info",
+                "security": [{
+                    "UserAuth": []
+                }],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/getUpdateUserProfile"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success update user",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "number"
+                                        },
+                                        "status": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/getUpdateUserProfile"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["User API"],
+                "description": "used to delete account",
+                "summary": "used to delete account",
+                "security": [{
+                    "UserAuth": []
+                }],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "no_telepon": {
+                                        "type": "string"
+                                    },
+                                    "password": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success delete account",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "number"
+                                        },
+                                        "status": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "username": {
+                                                    "type": "string"
+                                                },
+                                                "no_telepon": {
+                                                    "type": "number"
+                                                },
+                                                "message": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/purchase": {
+            "get": {
+                "tags": ["User API"],
+                "description": "get purchase milik user",
+                "summary": "get purchase milik user",
+                "security": [{
+                    "UserAuth": []
+                }],
+                "responses": {
+                    "200": {
+                        "description": "Success get all purchase",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "number"
+                                        },
+                                        "status": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id_order": {
+                                                        "type": "string"
+                                                    },
+                                                    "name_store": {
+                                                        "type": "string"
+                                                    },
+                                                    "product_name": {
+                                                        "type": "string"
+                                                    },
+                                                    "total_amount": {
+                                                        "type": "number"
+                                                    },
+                                                    "payment_method": {
+                                                        "type": "string"
+                                                    },
+                                                    "status_order": {
+                                                        "type": "string"
+                                                    },
+                                                    "shipping_method": {
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/stores": {
+            "post": {
+                "tags": ["Store API"],
+                "description": "used to create new store",
+                "summary": "used to create new store",
+                "security": [{
+                    "UserAuth": []
+                }],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "success create new store",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "number"
+                                        },
+                                        "status": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "message": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["Store API"],
+                "description": "delete account store",
+                "summary": "delete account store",
+                "security": [{
+                    "UserAuth": []
+                }],
+                "responses": {
+                    "200": {
+                        "description": "success delete store",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "number"
+                                        },
+                                        "status": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "message": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/stores/profile": {
+            "get": {
+                "tags": ["Store API"],
+                "description": "used to get profile store",
+                "summary": "used to get profile store",
+                "security": [{
+                    "UserAuth": []
+                }],
+                "responses": {
+                    "200": {
+                        "description": "success get profile store",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "number"
+                                        },
+                                        "status": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "logo": {
+                                                    "type": "string"
+                                                },
+                                                "description": {
+                                                    "type": "string"
+                                                },
+                                                "no_telepon": {
+                                                    "type": "string"
+                                                },
+                                                "email": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "tags": ["Store API"],
+                "description": "used to update profile store",
+                "summary": "used to update profile store",
+                "security": [{
+                    "UserAuth": []
+                }],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "logo": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "success update profile store",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "number"
+                                        },
+                                        "status": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "logo": {
+                                                    "type": "string"
+                                                },
+                                                "description": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/stores/products": {
+            "post": {
+                "tags": ["Product API"],
+                "description": "add new product",
+                "summary": "add new product",
+                "security": [{
+                    "UserAuth": []
+                }],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/createUpdateProduct"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "success add new product",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "integer"
+                                        },
+                                        "status": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "message": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "get": {
+                "tags": ["Product API"],
+                "description": "get all products",
+                "summary": "get all products",
+                "security": [{
+                    "UserAuth": []
+                }],
+                "responses": {
+                    "200": {
+                        "description": "success get all product",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "number"
+                                        },
+                                        "status": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "number"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "sale": {
+                                                        "type": "number"
+                                                    },
+                                                    "price": {
+                                                        "type": "number"
+                                                    },
+                                                    "stock": {
+                                                        "type": "number"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
+            }
+        },
+        "/stores/products/{productId}": {
+            "get": {
+                "tags": ["Product API"],
+                "description": "get product by id",
+                "summary": "get product by id",
+                "parameters": [{
+                    "name": "productId",
+                    "in": "path",
+                    "description": "product Id",
+                    "schema": {},
+                    "required": true
+                }],
+                "security": [{
+                    "UserAuth": []
+                }],
+                "responses": {
+                    "200": {
+                        "description": "success get product by id",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "number"
+                                        },
+                                        "status": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/createUpdateProduct"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "tags": ["Product API"],
+                "description": "update product",
+                "summary": "update product",
+                "parameters": [{
+                    "name": "productId",
+                    "in": "path",
+                    "description": "product Id",
+                    "schema": {},
+                    "required": true
+                }],
+                "security": [{
+                    "UserAuth": []
+                }],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/createUpdateProduct"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "success update product",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "number"
+                                        },
+                                        "status": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "number"
+                                                },
+                                                "photo": {
+                                                    "type": "string"
+                                                   },
+                                                   "name": {
+                                                    "type": "string"
+                                                   },
+                                                   "category": {
+                                                    "type": "string"
+                                                   },
+                                                   "description": {
+                                                    "type": "string"
+                                                   },
+                                                   "dangerius_product": {
+                                                    "type": "string"
+                                                   },
+                                                   "price": {
+                                                    "type": "number"
+                                                   },
+                                                   "stock": {
+                                                    "type": "integer"
+                                                   },
+                                                   "wholesaler": {
+                                                    "type": "number"
+                                                   },
+                                                   "shipping_cost": {
+                                                    "type": "number"
+                                                   },
+                                                   "shipping_insurance": {
+                                                    "type": "string"
+                                                   },
+                                                   "condition": {
+                                                    "type": "string"
+                                                   },
+                                                   "pre_order": {
+                                                    "type": "string"
+                                                   },
+                                                   "status": {
+                                                    "type": "string"
+                                                   }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["Product API"],
+                "description": "remove product id",
+                "summary": "remove product by id",
+                "parameters": [{
+                    "name": "productId",
+                    "in": "path",
+                    "description": "product Id",
+                    "schema": {},
+                    "required": true
+                }],
+                "security": [{
+                    "UserAuth": []
+                }],
+                "responses": {
+                    "200": {
+                        "description": "success remove product",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "number"
+                                        },
+                                        "status": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "message": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/orders": {
+            "post": {
+                "tags": ["Order API"],
+                "description": "create new order",
+                "summary": "create new order",
+                "security": [{
+                    "UserAuth": []
+                }],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "success create new order"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "UserAuth": {
+                "type": "apiKey",
+                "in": "header",
+                "name": "X-API-KEY",
+                "description": "Authentication for user"
+            }
+        },
+        "schemas": {
+            "getUpdateUserProfile": {
+                "type": "object",
+                "properties": {
+                    "username": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "no_telepon": {
+                        "type": "string"
+                    },
+                    "photo_profile": {
+                        "type": "string"
+                    },
+                    "name_store": {
+                        "type": "string"
+                    },
+                    "gender": {
+                        "type": "string"
+                    },
+                    "birth_date" : {
+                        "type": "string"
+                    }
+                }
+            },
+            "createUpdateProduct": {
+                "type": "object",
+                "properties": {
+                   "photo": {
+                    "type": "string"
+                   },
+                   "name": {
+                    "type": "string"
+                   },
+                   "category": {
+                    "type": "string"
+                   },
+                   "description": {
+                    "type": "string"
+                   },
+                   "dangerius_product": {
+                    "type": "string"
+                   },
+                   "price": {
+                    "type": "number"
+                   },
+                   "stock": {
+                    "type": "integer"
+                   },
+                   "wholesaler": {
+                    "type": "number"
+                   },
+                   "shipping_cost": {
+                    "type": "number"
+                   },
+                   "shipping_insurance": {
+                    "type": "string"
+                   },
+                   "condition": {
+                    "type": "string"
+                   },
+                   "pre_order": {
+                    "type": "string"
+                   },
+                   "status": {
+                    "type": "string"
+                   }
+                }
+            }
+        }
+    }
+}
