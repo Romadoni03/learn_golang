@@ -6,3 +6,4 @@ catatan :
 4. untuk api product yang get untuk kedepanya akan menggunakan pagination,
 5. untuk product hanya masih 1 foto, selantunya bisa upload max 4 foto
 6. endpoint untuk order dll ( yang advance) menyusul
+7. sekarang menggunakan db seperti biasa, next implementasi migration
