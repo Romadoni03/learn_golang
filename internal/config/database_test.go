@@ -1,9 +1,10 @@
-package test
+package config_test
 
 import (
 	"database/sql"
-	_ "github.com/go-sql-driver/mysql"
 	"testing"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 func TestOpenConnection(t *testing.T) {

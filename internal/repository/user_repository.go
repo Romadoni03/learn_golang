@@ -7,5 +7,5 @@ import (
 )
 
 type UserRepository interface {
-	Insert(ctx context.Context, tx *sql.Tx, user entity.User) entity.User
+	Insert(ctx context.Context, tx *sql.Tx, user entity.User) error
 }

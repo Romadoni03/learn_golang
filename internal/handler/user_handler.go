@@ -6,6 +6,6 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-type UserController interface {
+type UserHandler interface {
 	Create(writer http.ResponseWriter, Request *http.Request, params httprouter.Params)
 }
