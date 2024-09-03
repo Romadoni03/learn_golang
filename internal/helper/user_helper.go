@@ -1,6 +1,7 @@
 package helper
 
 import (
+	"encoding/base64"
 	"math/rand"
 	"time"
 
@@ -42,4 +43,33 @@ func CompiringPassword(hashPassword, password string) error {
 		return err
 	}
 	return nil
+}
+
+func GeneratedTimeNow() time.Time {
+	t := time.Now().Local().Format("2006-01-02 15:04:05")
+	layoutFormat := "2006-01-02 15:04:05"
+
+	date, err := time.Parse(layoutFormat, t)
+
+	IfPanicError(err)
+
+	return date
+}
+
+func EncodeImageName(data string) string {
+	encode := make([]byte, base64.StdEncoding.EncodedLen(len(data)))
+	base64.StdEncoding.Encode(encode, []byte(data))
+	encodeImage := string(encode)
+
+	return encodeImage
+}
+
+func DecodeImageName(data string) string {
+	decode := make([]byte, base64.StdEncoding.DecodedLen(len(data)))
+	_, err := base64.StdEncoding.Decode(decode, []byte(data))
+	IfPanicError(err)
+
+	decoded := string(decode)
+
+	return decoded
 }

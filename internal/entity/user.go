@@ -14,7 +14,7 @@ type User struct {
 	Bio                 string
 	Gender              string
 	StatusMember        string
-	BirthDate           time.Time
+	BirthDate           string
 	CreatedAt           time.Time
 	Token               string
 	TokenExpiredAt      int64

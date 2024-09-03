@@ -1,3 +1,7 @@
 package config
 
-func NewRouter()
+import "fmt"
+
+func NewRouter() {
+	fmt.Println("hello world")
+}

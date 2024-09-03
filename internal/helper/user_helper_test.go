@@ -4,7 +4,6 @@ import (
 	"ecommerce-cloning-app/internal/helper"
 	"fmt"
 	"testing"
-	"time"
 )
 
 func TestHashing(t *testing.T) {
@@ -44,10 +43,18 @@ func TestGeneratedUsername(t *testing.T) {
 }
 
 func TestTime(t *testing.T) {
-	var times = time.Now()
-	time1 := times.Local().Format("2006-01-02 15:04:05")
+	times := helper.GeneratedTimeNow()
 
-	timeSecond, _ := time.Parse(time.RFC3339, time1)
-	fmt.Printf("time1 %v\n", time1)
-	fmt.Println("hasil parse ", timeSecond)
+	fmt.Printf("%v", times)
+}
+
+func TestEncodeDecodeImage(t *testing.T) {
+	image := helper.EncodeImageName("account_profile.png")
+	image2 := helper.EncodeImageName("account_profile.png")
+
+	imageDecoded := helper.DecodeImageName("YWNjb3VudF9wcm9maWxlLnBuZw==")
+
+	fmt.Printf("Hasil encode: %s \n", image)
+	fmt.Printf("Hasil encode 2: %s \n", image2)
+	fmt.Printf("Hasil decoded: %s", imageDecoded)
 }

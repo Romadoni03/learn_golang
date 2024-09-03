@@ -26,10 +26,21 @@ func (service *UserServiceImpl) Create(ctx context.Context, request dto.UserCrea
 	defer helper.CommitOrRollback(tx)
 
 	user := entity.User{
-		Id:        helper.GenerateId(),
-		NoTelepon: request.NoTelepon,
-		Password:  helper.HashingPassword(request.Password),
-		Username:  helper.GeneratedUsername(),
+		Id:                  helper.GenerateId(),
+		NoTelepon:           request.NoTelepon,
+		Password:            helper.HashingPassword(request.Password),
+		Username:            helper.GeneratedUsername(),
+		LastUpdatedUsername: helper.GeneratedTimeNow(),
+		Name:                "",
+		Email:               "",
+		PhotoProfile:        helper.EncodeImageName("account_profile.png"),
+		Bio:                 "",
+		Gender:              "",
+		StatusMember:        "Basic",
+		BirthDate:           "",
+		CreatedAt:           helper.GeneratedTimeNow(),
+		Token:               "",
+		TokenExpiredAt:      0,
 	}
 
 	errService := service.UserRepository.Insert(ctx, tx, user)
