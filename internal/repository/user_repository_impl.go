@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"ecommerce-cloning-app/internal/entity"
+	"ecommerce-cloning-app/internal/helper"
 	"fmt"
 )
 
@@ -31,10 +32,8 @@ func (repository *UserRepositoryImpl) Insert(ctx context.Context, tx *sql.Tx, us
 		user.Token,
 		user.TokenExpiredAt)
 
-	if err != nil {
-		return err
-	} else {
-		fmt.Println("success add to database")
-		return nil
-	}
+	helper.IfPanicError(err)
+
+	fmt.Println("success add to database")
+	return nil
 }
