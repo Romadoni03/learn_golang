@@ -34,7 +34,6 @@ func TestInsert(t *testing.T) {
 	truncateUser(db)
 
 	user := entity.User{
-		Id:                  helper.GenerateId(),
 		NoTelepon:           "123567898765",
 		Password:            helper.HashingPassword("rahasia"),
 		Username:            helper.GeneratedUsername(),
@@ -66,3 +65,29 @@ func TestInsert(t *testing.T) {
 		fmt.Println("repository aman")
 	}
 }
+
+// func TestFindByTelp(t *testing.T) {
+// 	db := setUpDB()
+// 	truncateUser(db)
+
+// 	repository := repository.UserRepositoryImpl{}
+// 	tx, err := db.Begin()
+// 	helper.IfPanicError(err)
+// 	defer helper.CommitOrRollback(tx)
+// 	context := context.Background()
+// 	defer context.Done()
+
+// 	user, errRequest := repository.FindByTelepon(context, tx, "083156490686")
+
+// 	if errRequest != nil {
+// 		panic(errRequest)
+// 	} else {
+// 		fmt.Println("sukses")
+// 	}
+
+// 	fmt.Println(user.Id)
+// 	fmt.Println(user.NoTelepon)
+// 	fmt.Println(user.Password)
+// 	fmt.Println(user.Username)
+
+// }

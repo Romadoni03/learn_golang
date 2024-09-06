@@ -5,3 +5,9 @@ func IfPanicError(err error) {
 		panic(err)
 	}
 }
+
+func PanicWithMessage(err error, message string) {
+	if err != nil {
+		panic(message)
+	}
+}

@@ -58,3 +58,16 @@ func TestEncodeDecodeImage(t *testing.T) {
 	fmt.Printf("Hasil encode 2: %s \n", image2)
 	fmt.Printf("Hasil decoded: %s", imageDecoded)
 }
+
+func TestUuid(t *testing.T) {
+	uuid01 := helper.GeneratedToken()
+	uuid02 := helper.GeneratedToken()
+
+	fmt.Printf("Generated token 1 : %s \n", uuid01)
+	fmt.Printf("Generated token 2 : %s \n", uuid02)
+
+	fmt.Println("10 token random")
+	for i := 0; i < 10; i++ {
+		fmt.Println(helper.GeneratedToken())
+	}
+}

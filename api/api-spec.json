@@ -102,6 +102,9 @@
                                         "data": {
                                             "type": "object",
                                             "properties": {
+                                                "no_telepon": {
+                                                    "type": "string"
+                                                },
                                                 "username": {
                                                     "type": "string"
                                                 },

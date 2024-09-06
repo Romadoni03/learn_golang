@@ -1,9 +1,8 @@
 @startuml erd
 
 entity User {
-    * user_id VARCHAR (255) <<PK>>
+    * no_telepon VARCHAR (255) <<PK>>
     --
-    * no_telepon VARCHAR (13)
     * password VARCHAR (255)
     * username VARCHAR (30)
     * last_updated_username DATETIME 
@@ -23,7 +22,7 @@ entity User {
 
 entity Store {
     * store_id VARCHAR (255) <<PK>>
-    * user_id VARCHAR (255) <<FK>>
+    * no_telepon VARCHAR (255) <<FK>>
     --
     * name VARCHAR (255) <<UNI>>
     * last_updated_name (255) BIGINT
@@ -62,7 +61,7 @@ entity Product {
 
 entity Order {
     * order_id VARCHAR (200) <<PK>>
-    * user_id VARCHAR (200) <<FK>>
+    * no_telepon VARCHAR (200) <<FK>>
     --
     * order_date DATETIME
     * order_complition_date DATETIME

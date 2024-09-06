@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -72,4 +73,11 @@ func DecodeImageName(data string) string {
 	decoded := string(decode)
 
 	return decoded
+}
+
+func GeneratedToken() string {
+	uuid := uuid.New()
+
+	return uuid.String()
+
 }

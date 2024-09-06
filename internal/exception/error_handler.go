@@ -30,7 +30,7 @@ func validationErrors(writer http.ResponseWriter, _ *http.Request, err any) bool
 		webResponse := dto.WebResponse{
 			Code:   http.StatusBadRequest,
 			Status: "BAD REQUEST",
-			Data:   exception.Error(),
+			Data:   map[string]string{"message": exception.Error()},
 		}
 
 		helper.WriteToResponseBody(writer, webResponse)
@@ -51,7 +51,7 @@ func notFoundErrors(writer http.ResponseWriter, _ *http.Request, err any) bool {
 		webResponse := dto.WebResponse{
 			Code:   http.StatusNotFound,
 			Status: "NOT FOUND",
-			Data:   exception.Error,
+			Data:   map[string]string{"message": exception.Error},
 		}
 
 		helper.WriteToResponseBody(writer, webResponse)
@@ -68,7 +68,7 @@ func internalServerErrors(writer http.ResponseWriter, _ *http.Request, err any) 
 	webResponse := dto.WebResponse{
 		Code:   http.StatusInternalServerError,
 		Status: "INTERNAL SERVER ERROR",
-		Data:   err,
+		Data:   map[string]any{"message": err},
 	}
 
 	helper.WriteToResponseBody(writer, webResponse)

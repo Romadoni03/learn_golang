@@ -18,11 +18,11 @@ func (controller *UserHandlerImpl) Create(writer http.ResponseWriter, request *h
 	helper.ReadFromRequestBody(request, &userCreateRequest)
 
 	userResponse, err := controller.UserService.Create(request.Context(), userCreateRequest)
-	helper.IfPanicError(err)
+	helper.PanicWithMessage(err, userResponse)
 	webResponse := dto.WebResponse{
-		Code:   200,
+		Code:   http.StatusOK,
 		Status: "OK",
-		Data:   userResponse,
+		Data:   map[string]string{"message": userResponse},
 	}
 
 	helper.WriteToResponseBody(writer, webResponse)
