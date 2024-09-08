@@ -11,6 +11,7 @@ func NewRouter(userHandler handler.UserHandler) *httprouter.Router {
 	router := httprouter.New()
 
 	router.POST("/api/users", userHandler.Create)
+	router.POST("/api/users/login", userHandler.Login)
 
 	router.PanicHandler = exception.ErrorHandler
 

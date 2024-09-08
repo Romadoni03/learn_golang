@@ -5,5 +5,5 @@ type UserLoginResponse struct {
 	Username       string `json:"username"`
 	Name           string `json:"name"`
 	Token          string `json:"token"`
-	TokenExpiredAt string `json:"token_expired_at"`
+	TokenExpiredAt int64  `json:"token_expired_at"`
 }

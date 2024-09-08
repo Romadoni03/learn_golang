@@ -4,6 +4,7 @@ import (
 	"ecommerce-cloning-app/internal/helper"
 	"fmt"
 	"testing"
+	"time"
 )
 
 func TestHashing(t *testing.T) {
@@ -70,4 +71,22 @@ func TestUuid(t *testing.T) {
 	for i := 0; i < 10; i++ {
 		fmt.Println(helper.GeneratedToken())
 	}
+}
+
+func TestExpiredAt(t *testing.T) {
+	myTime := time.Now().Local()
+
+	mili := myTime.UnixMilli()
+
+	fmt.Println(mili)
+	fmt.Println("data 5 menit  120000 : ", 2*60*1000)
+}
+
+func TestIseng(t *testing.T) {
+	data1 := 1725801925862
+	data2 := 1725802056815
+
+	data3 := data2 - data1
+
+	fmt.Println(data3)
 }

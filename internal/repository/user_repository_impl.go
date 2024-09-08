@@ -56,3 +56,12 @@ func (repository *UserRepositoryImpl) FindByPhone(ctx context.Context, tx *sql.T
 		return user, errors.New("user is not found")
 	}
 }
+
+func (repository *UserRepositoryImpl) UpdateToken(ctx context.Context, tx *sql.Tx, user entity.User) error {
+	SQL := "update users set token = ?, token_expired_at = ? where no_telepon = ?"
+	_, err := tx.ExecContext(ctx, SQL, user.Token, user.TokenExpiredAt, user.NoTelepon)
+	if err != nil {
+		return err
+	}
+	return nil
+}

@@ -5,11 +5,14 @@ import (
 	"database/sql"
 	"ecommerce-cloning-app/internal/dto"
 	"ecommerce-cloning-app/internal/entity"
+	"ecommerce-cloning-app/internal/exception"
 	"ecommerce-cloning-app/internal/helper"
 	"ecommerce-cloning-app/internal/repository"
 	"errors"
+	"time"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/google/uuid"
 )
 
 type UserServiceImpl struct {
@@ -67,14 +70,26 @@ func (service *UserServiceImpl) Login(ctx context.Context, request dto.UserCreat
 	helper.IfPanicError(err)
 	defer helper.CommitOrRollback(tx)
 
-	user, errCheck := service.UserRepository.FindByPhone(ctx, tx, request.NoTelepon)
-	helper.PanicWithMessage(errCheck, "user not found")
-	errCheckPw := helper.CompiringPassword(user.Password, request.Password)
+	data, errCheck := service.UserRepository.FindByPhone(ctx, tx, request.NoTelepon)
+	if errCheck != nil {
+		panic(exception.NewNotFoundError("user not found"))
+	}
+	errCheckPw := helper.CompiringPassword(data.Password, request.Password)
 
-	helper.PanicWithMessage(errCheckPw, "password wrong")
+	helper.PanicWithMessage(errCheckPw, "password is wrong")
+	user := entity.User{
+		Username:       data.Username,
+		NoTelepon:      data.NoTelepon,
+		Token:          uuid.NewString(),
+		TokenExpiredAt: time.Now().Local().UnixMilli() + (1000 * 60 * 60 * 24 * 7),
+	}
+	errToken := service.UserRepository.UpdateToken(ctx, tx, user)
+	helper.PanicWithMessage(errToken, "failed set token")
+
 	return dto.UserLoginResponse{
-		NoTelepon: user.NoTelepon,
-		Username:  user.Username,
-		Name:      user.Name,
+		NoTelepon:      user.NoTelepon,
+		Username:       user.Username,
+		Token:          user.Token,
+		TokenExpiredAt: user.TokenExpiredAt,
 	}
 }

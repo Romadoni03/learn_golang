@@ -13,11 +13,11 @@ type UserHandlerImpl struct {
 	UserService service.UserService
 }
 
-func (controller *UserHandlerImpl) Create(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+func (handler *UserHandlerImpl) Create(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	userCreateRequest := dto.UserCreateRequest{}
 	helper.ReadFromRequestBody(request, &userCreateRequest)
 
-	userResponse, err := controller.UserService.Create(request.Context(), userCreateRequest)
+	userResponse, err := handler.UserService.Create(request.Context(), userCreateRequest)
 	helper.PanicWithMessage(err, userResponse)
 	webResponse := dto.WebResponse{
 		Code:   http.StatusOK,
@@ -27,4 +27,18 @@ func (controller *UserHandlerImpl) Create(writer http.ResponseWriter, request *h
 
 	helper.WriteToResponseBody(writer, webResponse)
 
+}
+
+func (handler *UserHandlerImpl) Login(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	userLogin := dto.UserCreateRequest{}
+	helper.ReadFromRequestBody(request, &userLogin)
+
+	userResponse := handler.UserService.Login(request.Context(), userLogin)
+	webResponse := dto.WebResponse{
+		Code:   http.StatusOK,
+		Status: "OK",
+		Data:   userResponse,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
 }
