@@ -65,3 +65,29 @@ func (repository *UserRepositoryImpl) UpdateToken(ctx context.Context, tx *sql.T
 	}
 	return nil
 }
+
+func (repository *UserRepositoryImpl) FindFirstByToken(ctx context.Context, tx *sql.Tx, token string) (entity.User, error) {
+	SQL := "select token, token_expired_at from users where token = ?"
+	rows, err := tx.QueryContext(ctx, SQL, token)
+	helper.IfPanicError(err)
+	defer rows.Close()
+
+	user := entity.User{}
+	if rows.Next() {
+		errNext := rows.Scan(&user.Token, &user.TokenExpiredAt)
+		helper.IfPanicError(errNext)
+		return user, nil
+	} else {
+		return user, errors.New("user by token is not found")
+	}
+
+}
+
+func (repository *UserRepositoryImpl) Logout(ctx context.Context, tx *sql.Tx, token string) error {
+	SQL := "update users set token = '', token_expired_at = 0 where token = ?"
+	_, err := tx.ExecContext(ctx, SQL, token)
+	if err != nil {
+		return err
+	}
+	return nil
+}

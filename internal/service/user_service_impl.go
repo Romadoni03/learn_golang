@@ -9,6 +9,7 @@ import (
 	"ecommerce-cloning-app/internal/helper"
 	"ecommerce-cloning-app/internal/repository"
 	"errors"
+	"net/http"
 	"time"
 
 	"github.com/go-playground/validator/v10"
@@ -72,11 +73,13 @@ func (service *UserServiceImpl) Login(ctx context.Context, request dto.UserCreat
 
 	data, errCheck := service.UserRepository.FindByPhone(ctx, tx, request.NoTelepon)
 	if errCheck != nil {
-		panic(exception.NewNotFoundError("user not found"))
+		panic(exception.NewUnauthorizedError("username or password is wrong"))
 	}
 	errCheckPw := helper.CompiringPassword(data.Password, request.Password)
 
-	helper.PanicWithMessage(errCheckPw, "password is wrong")
+	if errCheckPw != nil {
+		panic(exception.NewUnauthorizedError("username or password is wrong"))
+	}
 	user := entity.User{
 		Username:       data.Username,
 		NoTelepon:      data.NoTelepon,
@@ -92,4 +95,16 @@ func (service *UserServiceImpl) Login(ctx context.Context, request dto.UserCreat
 		Token:          user.Token,
 		TokenExpiredAt: user.TokenExpiredAt,
 	}
+}
+
+func (service *UserServiceImpl) Logout(ctx context.Context, request *http.Request) string {
+	token := request.Header.Get("API-KEY")
+	tx, err := service.DB.Begin()
+	helper.IfPanicError(err)
+	defer helper.CommitOrRollback(tx)
+	errLogout := service.UserRepository.Logout(ctx, tx, token)
+	if errLogout != nil {
+		panic(exception.NewUnauthorizedError("failed to logout"))
+	}
+	return "success logout"
 }

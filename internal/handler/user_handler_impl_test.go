@@ -73,3 +73,56 @@ func TestCreateUserSuccess(t *testing.T) {
 
 	fmt.Println(responseBody["data"])
 }
+
+func TestLoginSuccess(t *testing.T) {
+	db := setUpDB()
+	truncateUser(db)
+	router := setupRouter(db)
+
+	requestBody := strings.NewReader(`{"no_telepon" : "123123125", "password" : "rahasia"}`)
+	request := httptest.NewRequest(http.MethodPost, "http://localhost:3000/api/users/login", requestBody)
+	request.Header.Add("Content-Type", "application/json")
+
+	recorder := httptest.NewRecorder()
+
+	router.ServeHTTP(recorder, request)
+
+	response := recorder.Result()
+	assert.Equal(t, 200, response.StatusCode)
+
+	body, _ := io.ReadAll(response.Body)
+	var responseBody map[string]any
+	json.Unmarshal(body, &responseBody)
+
+	assert.Equal(t, "OK", responseBody["status"])
+
+	fmt.Println(responseBody["data"])
+
+}
+
+func TestLogout(t *testing.T) {
+	db := setUpDB()
+	truncateUser(db)
+	router := setupRouter(db)
+
+	request := httptest.NewRequest(http.MethodDelete, "http://localhost:3000/api/users/logout", nil)
+	request.Header.Add("Content-Type", "application/json")
+	request.Header.Add("API-KEY", "e7e4551a-2f1e-4062-8f57-af012eea10c1")
+
+	recorder := httptest.NewRecorder()
+
+	router.ServeHTTP(recorder, request)
+
+	response := recorder.Result()
+	assert.Equal(t, 404, response.StatusCode)
+
+	body, _ := io.ReadAll(response.Body)
+	var responseBody map[string]any
+	json.Unmarshal(body, &responseBody)
+
+	// assert.Equal(t, "OK", responseBody["status"])
+
+	fmt.Println(response.StatusCode)
+	fmt.Println(request.Header.Get("API-KEY"))
+
+}

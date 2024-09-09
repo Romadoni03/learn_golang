@@ -66,6 +66,23 @@ func TestInsert(t *testing.T) {
 	}
 }
 
+func TestFindFirstByToken(t *testing.T) {
+	db := setUpDB()
+	truncateUser(db)
+
+	repository := repository.UserRepositoryImpl{}
+	tx, err := db.Begin()
+	helper.IfPanicError(err)
+	defer helper.CommitOrRollback(tx)
+	context := context.Background()
+	defer context.Done()
+
+	user, _ := repository.FindFirstByToken(context, tx, "eb238c9b-bcd8-412a-b694-d570f9cbafa5")
+
+	fmt.Println(user.Token)
+	fmt.Println(user.TokenExpiredAt)
+}
+
 // func TestFindByTelp(t *testing.T) {
 // 	db := setUpDB()
 // 	truncateUser(db)

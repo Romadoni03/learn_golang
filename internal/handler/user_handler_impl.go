@@ -42,3 +42,14 @@ func (handler *UserHandlerImpl) Login(writer http.ResponseWriter, request *http.
 
 	helper.WriteToResponseBody(writer, webResponse)
 }
+
+func (handler *UserHandlerImpl) Logout(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	message := handler.UserService.Logout(request.Context(), request)
+	webResponse := dto.WebResponse{
+		Code:   http.StatusOK,
+		Status: "OK",
+		Data:   map[string]string{"message": message},
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}
