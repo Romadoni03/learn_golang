@@ -91,3 +91,19 @@ func (repository *UserRepositoryImpl) Logout(ctx context.Context, tx *sql.Tx, to
 	}
 	return nil
 }
+
+func (repository *UserRepositoryImpl) GetByToken(ctx context.Context, tx *sql.Tx, token string) (entity.User, error) {
+	SQL := "select username, name, email, no_telepon, photo_profile, name_store, gender, birth_date from users where token = ?"
+	rows, err := tx.QueryContext(ctx, SQL, token)
+	helper.IfPanicError(err)
+	defer rows.Close()
+
+	user := entity.User{}
+	if rows.Next() {
+		errNext := rows.Scan(&user.Username, &user.Name, &user.Email, &user.NoTelepon, &user.PhotoProfile, &user.Gender, &user.BirthDate)
+		helper.IfPanicError(errNext)
+		return user, nil
+	} else {
+		return user, errors.New("user not found")
+	}
+}

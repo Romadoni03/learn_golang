@@ -108,3 +108,26 @@ func (service *UserServiceImpl) Logout(ctx context.Context, request *http.Reques
 	}
 	return "success logout"
 }
+
+func (service *UserServiceImpl) GetByToken(ctx context.Context, request *http.Request) dto.UserProfileResponse {
+	token := request.Header.Get("API-KEY")
+	tx, err := service.DB.Begin()
+	helper.IfPanicError(err)
+	defer helper.CommitOrRollback(tx)
+
+	user, err := service.UserRepository.GetByToken(ctx, tx, token)
+	if err != nil {
+		panic(exception.NewNotFoundError("user not found"))
+	}
+
+	return dto.UserProfileResponse{
+		Username:     user.Username,
+		Name:         user.Name,
+		Email:        user.Email,
+		NoTelepon:    user.NoTelepon,
+		PhotoProfile: user.PhotoProfile,
+		NameStore:    "",
+		Gender:       user.Gender,
+		BirthDate:    user.BirthDate,
+	}
+}

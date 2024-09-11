@@ -53,3 +53,7 @@ func (handler *UserHandlerImpl) Logout(writer http.ResponseWriter, request *http
 
 	helper.WriteToResponseBody(writer, webResponse)
 }
+
+func (handler *UserHandlerImpl) GetByToken(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+
+}

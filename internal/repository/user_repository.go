@@ -12,4 +12,5 @@ type UserRepository interface {
 	UpdateToken(ctx context.Context, tx *sql.Tx, user entity.User) error
 	FindFirstByToken(ctx context.Context, tx *sql.Tx, token string) (entity.User, error)
 	Logout(ctx context.Context, tx *sql.Tx, token string) error
+	GetByToken(ctx context.Context, tx *sql.Tx, token string) (entity.User, error)
 }
