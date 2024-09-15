@@ -5,6 +5,7 @@ import (
 	"ecommerce-cloning-app/internal/config"
 	"ecommerce-cloning-app/internal/handler"
 	"ecommerce-cloning-app/internal/helper"
+	"ecommerce-cloning-app/internal/middleware"
 	"ecommerce-cloning-app/internal/repository"
 	"ecommerce-cloning-app/internal/service"
 	"encoding/json"
@@ -39,7 +40,9 @@ func setupRouter(db *sql.DB) *httprouter.Router {
 	userRepository := repository.UserRepositoryImpl{}
 	userService := service.UserServiceImpl{UserRepository: &userRepository, DB: db, Validate: validate}
 	userHandler := handler.UserHandlerImpl{UserService: &userService}
-	router := config.NewRouter(&userHandler)
+	middleware := middleware.AuthMiddleware{UserRepository: &userRepository, DB: db}
+
+	router := config.NewRouter(&userHandler, middleware)
 
 	return router
 

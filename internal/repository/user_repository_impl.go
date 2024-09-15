@@ -83,7 +83,7 @@ func (repository *UserRepositoryImpl) FindFirstByToken(ctx context.Context, tx *
 
 }
 
-func (repository *UserRepositoryImpl) Logout(ctx context.Context, tx *sql.Tx, token string) error {
+func (repository *UserRepositoryImpl) DeleteToken(ctx context.Context, tx *sql.Tx, token string) error {
 	SQL := "update users set token = '', token_expired_at = 0 where token = ?"
 	_, err := tx.ExecContext(ctx, SQL, token)
 	if err != nil {
@@ -93,15 +93,17 @@ func (repository *UserRepositoryImpl) Logout(ctx context.Context, tx *sql.Tx, to
 }
 
 func (repository *UserRepositoryImpl) GetByToken(ctx context.Context, tx *sql.Tx, token string) (entity.User, error) {
-	SQL := "select username, name, email, no_telepon, photo_profile, name_store, gender, birth_date from users where token = ?"
+	SQL := "select username, users.name, email, users.no_telepon, photo_profile, stores.name, gender, birth_date from users LEFT JOIN stores ON users.no_telepon = stores.no_telepon where token = ?"
 	rows, err := tx.QueryContext(ctx, SQL, token)
 	helper.IfPanicError(err)
 	defer rows.Close()
 
 	user := entity.User{}
+	// store := entity.Store{}
 	if rows.Next() {
-		errNext := rows.Scan(&user.Username, &user.Name, &user.Email, &user.NoTelepon, &user.PhotoProfile, &user.Gender, &user.BirthDate)
+		errNext := rows.Scan(&user.Username, &user.Name, &user.Email, &user.NoTelepon, &user.PhotoProfile, &user.Store.Name, &user.Gender, &user.BirthDate)
 		helper.IfPanicError(errNext)
+		// user.Store = store
 		return user, nil
 	} else {
 		return user, errors.New("user not found")

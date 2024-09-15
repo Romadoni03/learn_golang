@@ -3,6 +3,7 @@ package helper_test
 import (
 	"ecommerce-cloning-app/internal/helper"
 	"fmt"
+	_ "image/png"
 	"testing"
 	"time"
 )
@@ -60,19 +61,6 @@ func TestEncodeDecodeImage(t *testing.T) {
 	fmt.Printf("Hasil decoded: %s", imageDecoded)
 }
 
-func TestUuid(t *testing.T) {
-	uuid01 := helper.GeneratedToken()
-	uuid02 := helper.GeneratedToken()
-
-	fmt.Printf("Generated token 1 : %s \n", uuid01)
-	fmt.Printf("Generated token 2 : %s \n", uuid02)
-
-	fmt.Println("10 token random")
-	for i := 0; i < 10; i++ {
-		fmt.Println(helper.GeneratedToken())
-	}
-}
-
 func TestExpiredAt(t *testing.T) {
 	myTime := time.Now().Local()
 
@@ -89,4 +77,16 @@ func TestIseng(t *testing.T) {
 	data3 := data2 - data1
 
 	fmt.Println(data3)
+}
+
+func TestGetImage(t *testing.T) {
+	// Panggil fungsi GetImage
+	img := helper.GetImage()
+
+	// Cek apakah gambar berhasil didapatkan
+	if img == nil {
+		t.Error("Failed to get image")
+	}
+
+	fmt.Println(img)
 }

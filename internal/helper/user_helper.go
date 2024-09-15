@@ -2,10 +2,11 @@ package helper
 
 import (
 	"encoding/base64"
+	"image"
 	"math/rand"
+	"os"
 	"time"
 
-	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -75,9 +76,15 @@ func DecodeImageName(data string) string {
 	return decoded
 }
 
-func GeneratedToken() string {
-	uuid := uuid.New()
+func GetImage() image.Image {
+	file, err := os.Open(`D:\dev\portofolio\ecommerce-cloning-app\assets\images\photo_profile\account_profile.png`)
+	IfPanicError(err)
+	defer file.Close()
 
-	return uuid.String()
+	img, _, err := image.Decode(file)
 
+	IfPanicError(err)
+	// img.Bounds()
+	// fmt.Println(img.Bounds())
+	return img
 }

@@ -55,5 +55,12 @@ func (handler *UserHandlerImpl) Logout(writer http.ResponseWriter, request *http
 }
 
 func (handler *UserHandlerImpl) GetByToken(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	userResponse := handler.UserService.GetByToken(request.Context(), request)
+	webResponse := dto.WebResponse{
+		Code:   http.StatusOK,
+		Status: "OK",
+		Data:   userResponse,
+	}
 
+	helper.WriteToResponseBody(writer, webResponse)
 }

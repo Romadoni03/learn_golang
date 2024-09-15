@@ -1,11 +1,14 @@
 package entity
 
-import "time"
+import (
+	"database/sql"
+	"time"
+)
 
 type Store struct {
 	StoreId         string
 	NoTelepon       string
-	Name            string
+	Name            sql.NullString
 	LastUpdatedName time.Time
 	Logo            string
 	Description     string

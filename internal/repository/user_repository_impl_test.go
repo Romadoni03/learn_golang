@@ -83,6 +83,23 @@ func TestFindFirstByToken(t *testing.T) {
 	fmt.Println(user.TokenExpiredAt)
 }
 
+func TestUserProfile(t *testing.T) {
+	db := setUpDB()
+	truncateUser(db)
+
+	repository := repository.UserRepositoryImpl{}
+	tx, err := db.Begin()
+	helper.IfPanicError(err)
+	defer helper.CommitOrRollback(tx)
+	context := context.Background()
+	defer context.Done()
+
+	user, _ := repository.GetByToken(context, tx, "0d49b062-c57c-477a-a23b-a20ccdd9ece0")
+
+	fmt.Println(user.Username)
+	fmt.Println(user.Store.Name)
+}
+
 // func TestFindByTelp(t *testing.T) {
 // 	db := setUpDB()
 // 	truncateUser(db)

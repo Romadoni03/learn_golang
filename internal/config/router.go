@@ -3,15 +3,18 @@ package config
 import (
 	"ecommerce-cloning-app/internal/exception"
 	"ecommerce-cloning-app/internal/handler"
+	"ecommerce-cloning-app/internal/middleware"
 
 	"github.com/julienschmidt/httprouter"
 )
 
-func NewRouter(userHandler handler.UserHandler) *httprouter.Router {
+func NewRouter(userHandler handler.UserHandler, middleware middleware.AuthMiddleware) *httprouter.Router {
 	router := httprouter.New()
 
 	router.POST("/api/users", userHandler.Create)
 	router.POST("/api/users/login", userHandler.Login)
+	router.DELETE("/api/users/logout", middleware.AuthMiddleware(userHandler.Logout))
+	router.GET("/api/users/profile", middleware.AuthMiddleware(userHandler.GetByToken))
 
 	router.PanicHandler = exception.ErrorHandler
 

@@ -102,7 +102,7 @@ func (service *UserServiceImpl) Logout(ctx context.Context, request *http.Reques
 	tx, err := service.DB.Begin()
 	helper.IfPanicError(err)
 	defer helper.CommitOrRollback(tx)
-	errLogout := service.UserRepository.Logout(ctx, tx, token)
+	errLogout := service.UserRepository.DeleteToken(ctx, tx, token)
 	if errLogout != nil {
 		panic(exception.NewUnauthorizedError("failed to logout"))
 	}
@@ -115,9 +115,17 @@ func (service *UserServiceImpl) GetByToken(ctx context.Context, request *http.Re
 	helper.IfPanicError(err)
 	defer helper.CommitOrRollback(tx)
 
+	var nameStore string
+	// var userProfile string
+
 	user, err := service.UserRepository.GetByToken(ctx, tx, token)
 	if err != nil {
 		panic(exception.NewNotFoundError("user not found"))
+	}
+	if !user.Store.Name.Valid {
+		nameStore = ""
+	} else {
+		nameStore = user.Store.Name.String
 	}
 
 	return dto.UserProfileResponse{
@@ -126,7 +134,7 @@ func (service *UserServiceImpl) GetByToken(ctx context.Context, request *http.Re
 		Email:        user.Email,
 		NoTelepon:    user.NoTelepon,
 		PhotoProfile: user.PhotoProfile,
-		NameStore:    "",
+		NameStore:    nameStore,
 		Gender:       user.Gender,
 		BirthDate:    user.BirthDate,
 	}
