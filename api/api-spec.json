@@ -208,7 +208,27 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/getUpdateUserProfile"
+                                "type": "object",
+                                "properties": {
+                                    "username": {
+                                        "type": "string"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "photo_profile": {
+                                        "type": "string"
+                                    },
+                                    "name_store": {
+                                        "type": "string"
+                                    },
+                                    "gender": {
+                                        "type": "string"
+                                    },
+                                    "birth_date" : {
+                                        "type": "string"
+                                    }
+                                }
                             }
                         }
                     }

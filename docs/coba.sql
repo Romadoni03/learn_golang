@@ -1,6 +1,5 @@
 create table users (
-    user_id VARCHAR (255) PRIMARY KEY,
-    no_telepon CHAR (13) UNIQUE,
+    no_telepon CHAR (13) PRIMARY KEY,
     password VARCHAR (255),
     username VARCHAR (200),
     last_updated_username DATETIME,
@@ -8,9 +7,9 @@ create table users (
     email VARCHAR (200),
     photo_profile VARCHAR (200),
     bio TEXT,
-    gender ENUM('laki-laki','perempuan'),
+    gender VARCHAR(20),
     status_member VARCHAR (200),
-    birth_date DATETIME,
+    birth_date VARCHAR(200),
     created_at TIMESTAMP,
     token VARCHAR (255),
     token_expired_at BIGINT
@@ -18,7 +17,7 @@ create table users (
 
 CREATE Table Stores (
     store_id VARCHAR (255) PRIMARY KEY NOT NULL,
-    user_id VARCHAR (255) NOT NULL,
+    no_telepon VARCHAR (255) NOT NULL,
     name VARCHAR (255) UNIQUE NOT NULL,
     last_updated_name DATETIME NOT NULL,
     logo VARCHAR (200),
@@ -31,7 +30,7 @@ CREATE Table Stores (
     total_product INT (4) NOT NULL,
     conditions VARCHAR (200) NOT NULL,
     created_at TIMESTAMP NOT NULL,
-    Foreign Key fk_users_stores(user_id) REFERENCES users (user_id)
+    Foreign Key fk_users_stores(no_telepon) REFERENCES users (no_telepon)
 )ENGINE=InnoDB;
 
 CREATE TABLE products (

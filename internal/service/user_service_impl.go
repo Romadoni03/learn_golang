@@ -43,7 +43,7 @@ func (service *UserServiceImpl) Create(ctx context.Context, request dto.UserCrea
 		LastUpdatedUsername: helper.GeneratedTimeNow(),
 		Name:                "",
 		Email:               "",
-		PhotoProfile:        helper.EncodeImageName("account_profile.png"),
+		PhotoProfile:        "account_profile.png",
 		Bio:                 "",
 		Gender:              "",
 		StatusMember:        "Basic",
@@ -133,8 +133,51 @@ func (service *UserServiceImpl) GetByToken(ctx context.Context, request *http.Re
 		Name:         user.Name,
 		Email:        user.Email,
 		NoTelepon:    user.NoTelepon,
-		PhotoProfile: user.PhotoProfile,
+		PhotoProfile: helper.GetImage(user.PhotoProfile),
 		NameStore:    nameStore,
+		Gender:       user.Gender,
+		BirthDate:    user.BirthDate,
+	}
+}
+
+func (service *UserServiceImpl) Update(ctx context.Context, request dto.UserUpdateRequest, token string) dto.UserProfileResponse {
+	tx, err := service.DB.Begin()
+	helper.IfPanicError(err)
+	defer helper.CommitOrRollback(tx)
+
+	user, errGetByToken := service.UserRepository.GetByToken(ctx, tx, token)
+	if errGetByToken != nil {
+		panic(exception.NewNotFoundError("User by token not found"))
+	}
+	//Usernames can only be updated once every 30 days
+	userLastUsername := user.LastUpdatedUsername.UnixMilli()
+
+	if (userLastUsername + (1000 * 60 * 60 * 24 * 30)) <= time.Now().Local().UnixMilli() {
+		panic(exception.NewUnauthorizedError("can't update username before 30 days"))
+	}
+
+	if user.Store.Name.String == "" {
+		request.NameStore = ""
+	}
+	// set user
+	user.Username = request.Username
+	user.Name = request.Name
+	user.Store.Name.String = request.NameStore
+	user.Gender = request.Gender
+	user.BirthDate = request.BirthDate
+	user.LastUpdatedUsername = helper.GeneratedTimeNow()
+	errUpdate := service.UserRepository.Update(ctx, tx, user)
+	if errUpdate != nil {
+		panic(exception.NewUnauthorizedError(errUpdate.Error()))
+	}
+
+	return dto.UserProfileResponse{
+		Username:     user.Username,
+		Name:         user.Name,
+		Email:        user.Email,
+		NoTelepon:    user.NoTelepon,
+		PhotoProfile: helper.GetImage(user.PhotoProfile),
+		NameStore:    user.Store.Name.String,
 		Gender:       user.Gender,
 		BirthDate:    user.BirthDate,
 	}

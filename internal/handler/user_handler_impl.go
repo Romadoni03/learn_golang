@@ -64,3 +64,18 @@ func (handler *UserHandlerImpl) GetByToken(writer http.ResponseWriter, request *
 
 	helper.WriteToResponseBody(writer, webResponse)
 }
+
+func (handler *UserHandlerImpl) Update(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	userUpdateRequest := dto.UserUpdateRequest{}
+	helper.ReadFromRequestBody(request, &userUpdateRequest)
+
+	userResponse := handler.UserService.Update(request.Context(), userUpdateRequest, request.Header.Get("API-KEY"))
+	webResponse := dto.WebResponse{
+		Code:   http.StatusOK,
+		Status: "OK",
+		Data:   userResponse,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+
+}

@@ -2,7 +2,7 @@ package helper
 
 import (
 	"encoding/base64"
-	"image"
+	"io"
 	"math/rand"
 	"os"
 	"time"
@@ -58,33 +58,16 @@ func GeneratedTimeNow() time.Time {
 	return date
 }
 
-func EncodeImageName(data string) string {
-	encode := make([]byte, base64.StdEncoding.EncodedLen(len(data)))
-	base64.StdEncoding.Encode(encode, []byte(data))
-	encodeImage := string(encode)
-
-	return encodeImage
-}
-
-func DecodeImageName(data string) string {
-	decode := make([]byte, base64.StdEncoding.DecodedLen(len(data)))
-	_, err := base64.StdEncoding.Decode(decode, []byte(data))
+func GetImage(image string) string {
+	// imageDcd := DecodeImageName(image)
+	fileImg, err := os.Open(`D:\dev\portofolio\ecommerce-cloning-app\assets\images\photo_profile\` + image)
 	IfPanicError(err)
+	defer fileImg.Close()
 
-	decoded := string(decode)
+	imgData, errImg := io.ReadAll(fileImg)
+	IfPanicError(errImg)
 
-	return decoded
-}
+	encodedImg := base64.StdEncoding.EncodeToString(imgData)
 
-func GetImage() image.Image {
-	file, err := os.Open(`D:\dev\portofolio\ecommerce-cloning-app\assets\images\photo_profile\account_profile.png`)
-	IfPanicError(err)
-	defer file.Close()
-
-	img, _, err := image.Decode(file)
-
-	IfPanicError(err)
-	// img.Bounds()
-	// fmt.Println(img.Bounds())
-	return img
+	return encodedImg
 }

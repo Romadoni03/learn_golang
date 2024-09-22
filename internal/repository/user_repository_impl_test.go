@@ -40,7 +40,7 @@ func TestInsert(t *testing.T) {
 		LastUpdatedUsername: helper.GeneratedTimeNow(),
 		Name:                "",
 		Email:               "",
-		PhotoProfile:        helper.EncodeImageName("account_profile.png"),
+		PhotoProfile:        "account_profile.png",
 		Bio:                 "",
 		Gender:              "",
 		StatusMember:        "",

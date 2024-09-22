@@ -29,7 +29,7 @@ func main() {
 		Handler: router,
 	}
 
-	err := server.ListenAndServe()
 	fmt.Println("server is running")
+	err := server.ListenAndServe()
 	helper.IfPanicError(err)
 }

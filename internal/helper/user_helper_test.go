@@ -50,17 +50,6 @@ func TestTime(t *testing.T) {
 	fmt.Printf("%v", times)
 }
 
-func TestEncodeDecodeImage(t *testing.T) {
-	image := helper.EncodeImageName("account_profile.png")
-	image2 := helper.EncodeImageName("account_profile.png")
-
-	imageDecoded := helper.DecodeImageName("YWNjb3VudF9wcm9maWxlLnBuZw==")
-
-	fmt.Printf("Hasil encode: %s \n", image)
-	fmt.Printf("Hasil encode 2: %s \n", image2)
-	fmt.Printf("Hasil decoded: %s", imageDecoded)
-}
-
 func TestExpiredAt(t *testing.T) {
 	myTime := time.Now().Local()
 
@@ -70,23 +59,9 @@ func TestExpiredAt(t *testing.T) {
 	fmt.Println("data 5 menit  120000 : ", 2*60*1000)
 }
 
-func TestIseng(t *testing.T) {
-	data1 := 1725801925862
-	data2 := 1725802056815
-
-	data3 := data2 - data1
-
-	fmt.Println(data3)
-}
-
 func TestGetImage(t *testing.T) {
 	// Panggil fungsi GetImage
-	img := helper.GetImage()
-
-	// Cek apakah gambar berhasil didapatkan
-	if img == nil {
-		t.Error("Failed to get image")
-	}
+	img := helper.GetImage("account_profile.png")
 
 	fmt.Println(img)
 }

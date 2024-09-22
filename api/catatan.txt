@@ -7,3 +7,5 @@ catatan :
 5. untuk product hanya masih 1 foto, selantunya bisa upload max 4 foto
 6. endpoint untuk order dll ( yang advance) menyusul
 7. sekarang menggunakan db seperti biasa, next implementasi migration
+8. update no telp & email menyusul
+9. update photo profile menyusul

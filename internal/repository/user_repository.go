@@ -13,4 +13,5 @@ type UserRepository interface {
 	FindFirstByToken(ctx context.Context, tx *sql.Tx, token string) (entity.User, error)
 	DeleteToken(ctx context.Context, tx *sql.Tx, token string) error
 	GetByToken(ctx context.Context, tx *sql.Tx, token string) (entity.User, error)
+	Update(ctx context.Context, tx *sql.Tx, user entity.User) error
 }
