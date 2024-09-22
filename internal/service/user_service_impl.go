@@ -9,6 +9,7 @@ import (
 	"ecommerce-cloning-app/internal/helper"
 	"ecommerce-cloning-app/internal/repository"
 	"errors"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -152,7 +153,9 @@ func (service *UserServiceImpl) Update(ctx context.Context, request dto.UserUpda
 	//Usernames can only be updated once every 30 days
 	userLastUsername := user.LastUpdatedUsername.UnixMilli()
 
-	if (userLastUsername + (1000 * 60 * 60 * 24 * 30)) <= time.Now().Local().UnixMilli() {
+	if (userLastUsername + (1000 * 60 * 60 * 24 * 30)) > time.Now().Local().UnixMilli() {
+		fmt.Println(userLastUsername)
+		fmt.Println(time.Now().Local().UnixMilli())
 		panic(exception.NewUnauthorizedError("can't update username before 30 days"))
 	}
 
@@ -168,7 +171,7 @@ func (service *UserServiceImpl) Update(ctx context.Context, request dto.UserUpda
 	user.LastUpdatedUsername = helper.GeneratedTimeNow()
 	errUpdate := service.UserRepository.Update(ctx, tx, user)
 	if errUpdate != nil {
-		panic(exception.NewUnauthorizedError(errUpdate.Error()))
+		panic(exception.NewUnauthorizedError("failed update user"))
 	}
 
 	return dto.UserProfileResponse{

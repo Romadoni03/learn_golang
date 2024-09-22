@@ -71,3 +71,17 @@ func GetImage(image string) string {
 
 	return encodedImg
 }
+
+func LastUpdateUsername(data time.Time) int64 {
+
+	dataString := data.String()
+
+	layout := "2006-01-02 15:04:05"
+
+	t, err := time.Parse(layout, dataString)
+	IfPanicError(err)
+
+	milliseconds := t.UnixMilli()
+
+	return milliseconds
+}

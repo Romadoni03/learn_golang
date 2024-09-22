@@ -93,7 +93,7 @@ func (repository *UserRepositoryImpl) DeleteToken(ctx context.Context, tx *sql.T
 }
 
 func (repository *UserRepositoryImpl) GetByToken(ctx context.Context, tx *sql.Tx, token string) (entity.User, error) {
-	SQL := "select username, users.name, email, users.no_telepon, photo_profile, stores.name, gender, birth_date from users LEFT JOIN stores ON users.no_telepon = stores.no_telepon where token = ?"
+	SQL := "select username, last_updated_username, users.name, email, users.no_telepon, photo_profile, stores.name, gender, birth_date from users LEFT JOIN stores ON users.no_telepon = stores.no_telepon where token = ?"
 	rows, err := tx.QueryContext(ctx, SQL, token)
 	helper.IfPanicError(err)
 	defer rows.Close()
@@ -101,7 +101,7 @@ func (repository *UserRepositoryImpl) GetByToken(ctx context.Context, tx *sql.Tx
 	user := entity.User{}
 	// store := entity.Store{}
 	if rows.Next() {
-		errNext := rows.Scan(&user.Username, &user.Name, &user.Email, &user.NoTelepon, &user.PhotoProfile, &user.Store.Name, &user.Gender, &user.BirthDate)
+		errNext := rows.Scan(&user.Username, &user.LastUpdatedUsername, &user.Name, &user.Email, &user.NoTelepon, &user.PhotoProfile, &user.Store.Name, &user.Gender, &user.BirthDate)
 		helper.IfPanicError(errNext)
 		// user.Store = store
 		return user, nil
