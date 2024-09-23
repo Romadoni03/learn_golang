@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/sirupsen/logrus"
 )
 
 type UserHandlerImpl struct {
@@ -16,9 +17,12 @@ type UserHandlerImpl struct {
 func (handler *UserHandlerImpl) Create(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	userCreateRequest := dto.UserCreateRequest{}
 	helper.ReadFromRequestBody(request, &userCreateRequest)
+	logrus.WithField("user with phone", userCreateRequest.NoTelepon).Info("Call method Create from handler")
 
 	userResponse, err := handler.UserService.Create(request.Context(), userCreateRequest)
 	helper.PanicWithMessage(err, userResponse)
+	logrus.Info(userResponse)
+
 	webResponse := dto.WebResponse{
 		Code:   http.StatusOK,
 		Status: "OK",

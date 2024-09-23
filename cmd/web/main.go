@@ -7,11 +7,11 @@ import (
 	"ecommerce-cloning-app/internal/middleware"
 	"ecommerce-cloning-app/internal/repository"
 	"ecommerce-cloning-app/internal/service"
-	"fmt"
 	"net/http"
 
 	"github.com/go-playground/validator/v10"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/sirupsen/logrus"
 )
 
 func main() {
@@ -29,7 +29,7 @@ func main() {
 		Handler: router,
 	}
 
-	fmt.Println("server is running")
+	logrus.Info("server is running")
 	err := server.ListenAndServe()
 	helper.IfPanicError(err)
 }

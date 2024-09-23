@@ -6,7 +6,8 @@ import (
 	"ecommerce-cloning-app/internal/entity"
 	"ecommerce-cloning-app/internal/helper"
 	"errors"
-	"fmt"
+
+	"github.com/sirupsen/logrus"
 )
 
 type UserRepositoryImpl struct {
@@ -33,11 +34,11 @@ func (repository *UserRepositoryImpl) Insert(ctx context.Context, tx *sql.Tx, us
 		user.TokenExpiredAt)
 
 	if err != nil {
-		fmt.Println(err)
+		logrus.Error(err)
 		return err
 	}
 
-	fmt.Println("success add to database")
+	logrus.Info("success add to database")
 	return nil
 }
 
