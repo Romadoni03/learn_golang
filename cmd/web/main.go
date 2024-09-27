@@ -4,6 +4,7 @@ import (
 	"ecommerce-cloning-app/internal/config"
 	"ecommerce-cloning-app/internal/handler"
 	"ecommerce-cloning-app/internal/helper"
+	"ecommerce-cloning-app/internal/logger"
 	"ecommerce-cloning-app/internal/middleware"
 	"ecommerce-cloning-app/internal/repository"
 	"ecommerce-cloning-app/internal/service"
@@ -11,7 +12,6 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/sirupsen/logrus"
 )
 
 func main() {
@@ -29,7 +29,7 @@ func main() {
 		Handler: router,
 	}
 
-	logrus.Info("server is running")
+	logger.Logging().Info("Server Is Running")
 	err := server.ListenAndServe()
 	helper.IfPanicError(err)
 }

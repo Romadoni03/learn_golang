@@ -7,6 +7,7 @@ import (
 	"ecommerce-cloning-app/internal/entity"
 	"ecommerce-cloning-app/internal/exception"
 	"ecommerce-cloning-app/internal/helper"
+	"ecommerce-cloning-app/internal/logger"
 	"ecommerce-cloning-app/internal/repository"
 	"errors"
 	"fmt"
@@ -24,6 +25,7 @@ type UserServiceImpl struct {
 }
 
 func (service *UserServiceImpl) Create(ctx context.Context, request dto.UserCreateRequest) (string, error) {
+	logger.Logging().Info("request from phone : " + request.NoTelepon + " call Create Func In Service")
 	err := service.Validate.Struct(request)
 	helper.PanicWithMessage(err, "No Telepon or Password can not be null")
 

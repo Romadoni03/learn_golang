@@ -49,7 +49,7 @@ func setupRouter(db *sql.DB) *httprouter.Router {
 }
 
 func truncateUser(db *sql.DB) {
-	db.Exec("TRUNCATE users")
+	db.Exec("DELETE FROM users")
 }
 
 func TestCreateUserSuccess(t *testing.T) {

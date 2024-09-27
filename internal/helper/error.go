@@ -1,17 +1,19 @@
 package helper
 
-import "github.com/sirupsen/logrus"
+import (
+	"ecommerce-cloning-app/internal/logger"
+)
 
 func IfPanicError(err error) {
 	if err != nil {
-		logrus.Error(err)
+		logger.Logging().Error(err)
 		panic(err)
 	}
 }
 
 func PanicWithMessage(err error, message string) {
 	if err != nil {
-		logrus.Error(message)
+		logger.Logging().Error(message)
 		panic(message)
 	}
 }

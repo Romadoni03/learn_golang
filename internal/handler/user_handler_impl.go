@@ -3,11 +3,11 @@ package handler
 import (
 	"ecommerce-cloning-app/internal/dto"
 	"ecommerce-cloning-app/internal/helper"
+	"ecommerce-cloning-app/internal/logger"
 	"ecommerce-cloning-app/internal/service"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
-	"github.com/sirupsen/logrus"
 )
 
 type UserHandlerImpl struct {
@@ -15,13 +15,13 @@ type UserHandlerImpl struct {
 }
 
 func (handler *UserHandlerImpl) Create(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	logger.LogHandler(request).Info("Incoming Request")
 	userCreateRequest := dto.UserCreateRequest{}
 	helper.ReadFromRequestBody(request, &userCreateRequest)
-	logrus.WithField("user with phone", userCreateRequest.NoTelepon).Info("Call method Create from handler")
 
 	userResponse, err := handler.UserService.Create(request.Context(), userCreateRequest)
 	helper.PanicWithMessage(err, userResponse)
-	logrus.Info(userResponse)
+	logger.LogHandler(request).Info(userResponse)
 
 	webResponse := dto.WebResponse{
 		Code:   http.StatusOK,
