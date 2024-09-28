@@ -10,7 +10,6 @@ import (
 	"ecommerce-cloning-app/internal/logger"
 	"ecommerce-cloning-app/internal/repository"
 	"errors"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -67,6 +66,7 @@ func (service *UserServiceImpl) Create(ctx context.Context, request dto.UserCrea
 }
 
 func (service *UserServiceImpl) Login(ctx context.Context, request dto.UserCreateRequest) dto.UserLoginResponse {
+	logger.Logging().Info("request from phone : " + request.NoTelepon + " call Login Func In Service")
 	err := service.Validate.Struct(request)
 	helper.PanicWithMessage(err, "No Telepon and password can not be null")
 
@@ -76,11 +76,13 @@ func (service *UserServiceImpl) Login(ctx context.Context, request dto.UserCreat
 
 	data, errCheck := service.UserRepository.FindByPhone(ctx, tx, request.NoTelepon)
 	if errCheck != nil {
+		logger.Logging().Error("username or password is wrong")
 		panic(exception.NewUnauthorizedError("username or password is wrong"))
 	}
 	errCheckPw := helper.CompiringPassword(data.Password, request.Password)
 
 	if errCheckPw != nil {
+		logger.Logging().Error("username or password is wrong")
 		panic(exception.NewUnauthorizedError("username or password is wrong"))
 	}
 	user := entity.User{
@@ -107,6 +109,7 @@ func (service *UserServiceImpl) Logout(ctx context.Context, request *http.Reques
 	defer helper.CommitOrRollback(tx)
 	errLogout := service.UserRepository.DeleteToken(ctx, tx, token)
 	if errLogout != nil {
+		logger.Logging().Error("failed to logout")
 		panic(exception.NewUnauthorizedError("failed to logout"))
 	}
 	return "success logout"
@@ -123,6 +126,7 @@ func (service *UserServiceImpl) GetByToken(ctx context.Context, request *http.Re
 
 	user, err := service.UserRepository.GetByToken(ctx, tx, token)
 	if err != nil {
+		logger.Logging().Error("user not found")
 		panic(exception.NewNotFoundError("user not found"))
 	}
 	if !user.Store.Name.Valid {
@@ -150,14 +154,14 @@ func (service *UserServiceImpl) Update(ctx context.Context, request dto.UserUpda
 
 	user, errGetByToken := service.UserRepository.GetByToken(ctx, tx, token)
 	if errGetByToken != nil {
+		logger.Logging().Error("User by token not found")
 		panic(exception.NewNotFoundError("User by token not found"))
 	}
 	//Usernames can only be updated once every 30 days
 	userLastUsername := user.LastUpdatedUsername.UnixMilli()
 
 	if (userLastUsername + (1000 * 60 * 60 * 24 * 30)) > time.Now().Local().UnixMilli() {
-		fmt.Println(userLastUsername)
-		fmt.Println(time.Now().Local().UnixMilli())
+		logger.Logging().Error("can't update username before 30 days")
 		panic(exception.NewUnauthorizedError("can't update username before 30 days"))
 	}
 
@@ -173,6 +177,7 @@ func (service *UserServiceImpl) Update(ctx context.Context, request dto.UserUpda
 	user.LastUpdatedUsername = helper.GeneratedTimeNow()
 	errUpdate := service.UserRepository.Update(ctx, tx, user)
 	if errUpdate != nil {
+		logger.Logging().Error("failed update user")
 		panic(exception.NewUnauthorizedError("failed update user"))
 	}
 

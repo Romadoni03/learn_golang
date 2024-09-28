@@ -25,7 +25,7 @@ func ErrorHandler(writer http.ResponseWriter, request *http.Request, err any) {
 }
 
 func validationErrors(writer http.ResponseWriter, _ *http.Request, err any) bool {
-	exception, ok := err.(validator.ValidationErrors)
+	_, ok := err.(validator.ValidationErrors)
 
 	if ok {
 		writer.Header().Set("Content-Type", "application/json")
@@ -34,7 +34,7 @@ func validationErrors(writer http.ResponseWriter, _ *http.Request, err any) bool
 		webResponse := dto.WebResponse{
 			Code:   http.StatusBadRequest,
 			Status: "BAD REQUEST",
-			Data:   map[string]string{"message": exception.Error()},
+			Data:   map[string]string{"message": "Field can not be null"},
 		}
 
 		helper.WriteToResponseBody(writer, webResponse)

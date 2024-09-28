@@ -14,6 +14,6 @@ func IfPanicError(err error) {
 func PanicWithMessage(err error, message string) {
 	if err != nil {
 		logger.Logging().Error(message)
-		panic(message)
+		panic(err)
 	}
 }

@@ -34,10 +34,12 @@ func (handler *UserHandlerImpl) Create(writer http.ResponseWriter, request *http
 }
 
 func (handler *UserHandlerImpl) Login(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	logger.LogHandler(request).Info("Incoming Request")
 	userLogin := dto.UserCreateRequest{}
 	helper.ReadFromRequestBody(request, &userLogin)
 
 	userResponse := handler.UserService.Login(request.Context(), userLogin)
+	logger.LogHandler(request).Info(userResponse)
 	webResponse := dto.WebResponse{
 		Code:   http.StatusOK,
 		Status: "OK",
