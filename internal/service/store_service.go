@@ -6,5 +6,5 @@ import (
 )
 
 type StoreService interface {
-	Create(ctx context.Context, request dto.StoreCreateRequest)
+	Create(ctx context.Context, request dto.StoreCreateRequest, token string) dto.StoreCreateResponse
 }

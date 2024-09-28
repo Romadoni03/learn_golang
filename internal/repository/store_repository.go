@@ -7,5 +7,5 @@ import (
 )
 
 type StoreRepository interface {
-	Insert(ctx context.Context, tx *sql.Tx, store entity.Store) entity.Store
+	Insert(ctx context.Context, tx *sql.Tx, store entity.Store) error
 }

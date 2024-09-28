@@ -17,12 +17,18 @@ import (
 func main() {
 	db, _ := config.NewDB()
 	validate := validator.New()
+	//user
 	userRepository := repository.UserRepositoryImpl{}
 	userService := service.UserServiceImpl{UserRepository: &userRepository, DB: db, Validate: validate}
 	userHandler := handler.UserHandlerImpl{UserService: &userService}
+	//store
+	storeRepository := repository.StoreRepositoryImpl{}
+	storeService := service.StoreServiceImpl{StoreRepository: &storeRepository, UserRepository: &userRepository, DB: db, Validate: validate}
+	storeHandler := handler.StoreHandlerImpl{StoreService: &storeService}
+	//middleware
 	middleware := middleware.AuthMiddleware{UserRepository: &userRepository, DB: db}
 
-	router := config.NewRouter(&userHandler, middleware)
+	router := config.NewRouter(&userHandler, &storeHandler, middleware)
 
 	server := http.Server{
 		Addr:    "localhost:3000",

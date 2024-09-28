@@ -1,5 +1,5 @@
 package dto
 
 type StoreCreateRequest struct {
-	Name string
+	Name string `validate:"required" json:"name"`
 }
