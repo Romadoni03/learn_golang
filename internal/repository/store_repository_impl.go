@@ -53,7 +53,7 @@ func (repository *StoreRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, s
 }
 
 func (repository *StoreRepositoryImpl) FindByUser(ctx context.Context, tx *sql.Tx, user entity.User) (entity.Store, error) {
-	SQL := "select store_id, no_telepon, name, last_updated_name, logo, description, status, link_store, total_comment, total_following, total_follower, total_product, conditions, created_at where no_telepon = ?"
+	SQL := "select store_id, no_telepon, name, last_updated_name, logo, description, status, link_store, total_comment, total_following, total_follower, total_product, conditions, created_at from stores where no_telepon = ?"
 
 	rows, err := tx.QueryContext(ctx, SQL, user.NoTelepon)
 	helper.IfPanicError(err)

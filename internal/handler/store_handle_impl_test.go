@@ -9,6 +9,7 @@ import (
 	"ecommerce-cloning-app/internal/repository"
 	"ecommerce-cloning-app/internal/service"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -69,4 +70,56 @@ func TestCreateStoreSuccess(t *testing.T) {
 	json.Unmarshal(body, &responseBody)
 
 	assert.Equal(t, "OK", responseBody["status"])
+}
+
+func TestDeleteStoreSuccess(t *testing.T) {
+	db := setUpDB()
+	truncateStores(db)
+	truncateUser(db)
+	tx, _ := db.Begin()
+	validate := validator.New()
+	userRepository := repository.UserRepositoryImpl{}
+	storeRepository := repository.StoreRepositoryImpl{}
+	userService := service.UserServiceImpl{DB: db, UserRepository: &userRepository, Validate: validate}
+	storeService := service.StoreServiceImpl{DB: db, UserRepository: &userRepository, StoreRepository: &storeRepository, Validate: validate}
+	user := entity.User{
+		NoTelepon:           "083156490686",
+		Password:            helper.HashingPassword("rahasia"),
+		Username:            helper.GeneratedUsername(),
+		LastUpdatedUsername: helper.GeneratedTimeNow(),
+		Name:                "",
+		Email:               "",
+		PhotoProfile:        "account_profile.png",
+		Bio:                 "",
+		Gender:              "",
+		StatusMember:        "Basic",
+		BirthDate:           "",
+		CreatedAt:           helper.GeneratedTimeNow(),
+		Token:               "",
+		TokenExpiredAt:      0,
+	}
+	userRepository.Insert(context.Background(), tx, user)
+	tx.Commit()
+	serviceResponse := userService.Login(context.Background(), dto.UserCreateRequest{NoTelepon: user.NoTelepon, Password: "rahasia"})
+	storeService.Create(context.Background(), dto.StoreCreateRequest{Name: "riski_taka_store"}, serviceResponse.Token)
+	router := setupRouter(db)
+
+	request := httptest.NewRequest(http.MethodDelete, "http://localhost:3000/api/stores", nil)
+	request.Header.Add("Content-Type", "application/json")
+	request.Header.Add("API-KEY", serviceResponse.Token)
+
+	recorder := httptest.NewRecorder()
+
+	router.ServeHTTP(recorder, request)
+
+	response := recorder.Result()
+	assert.Equal(t, 200, response.StatusCode)
+
+	body, _ := io.ReadAll(response.Body)
+	var responseBody map[string]any
+	json.Unmarshal(body, &responseBody)
+
+	assert.Equal(t, "OK", responseBody["status"])
+	assert.Equal(t, "Success Delete Store", responseBody["data"].(map[string]interface{})["message"])
+	fmt.Println(responseBody["data"])
 }
