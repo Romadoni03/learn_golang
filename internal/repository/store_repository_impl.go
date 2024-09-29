@@ -4,7 +4,9 @@ import (
 	"context"
 	"database/sql"
 	"ecommerce-cloning-app/internal/entity"
+	"ecommerce-cloning-app/internal/helper"
 	"ecommerce-cloning-app/internal/logger"
+	"errors"
 )
 
 type StoreRepositoryImpl struct {
@@ -48,4 +50,23 @@ func (repository *StoreRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, s
 		return err
 	}
 	return nil
+}
+
+func (repository *StoreRepositoryImpl) FindByUser(ctx context.Context, tx *sql.Tx, user entity.User) (entity.Store, error) {
+	SQL := "select store_id, no_telepon, name, last_updated_name, logo, description, status, link_store, total_comment, total_following, total_follower, total_product, conditions, created_at where no_telepon = ?"
+
+	rows, err := tx.QueryContext(ctx, SQL, user.NoTelepon)
+	helper.IfPanicError(err)
+	defer rows.Close()
+
+	store := entity.Store{}
+
+	if rows.Next() {
+		errNext := rows.Scan(&store.StoreId, &store.NoTelepon, &store.Name, &store.LastUpdatedName, &store.Logo, &store.Description, &store.Status, &store.LinkStore, &store.TotalComment, &store.TotalFollowing, &store.TotalFollower, &store.TotalProduct, &store.Condition, &store.CreatedAt)
+		helper.IfPanicError(errNext)
+
+		return store, nil
+	} else {
+		return store, errors.New("store not found")
+	}
 }

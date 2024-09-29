@@ -9,4 +9,5 @@ import (
 type StoreRepository interface {
 	Insert(ctx context.Context, tx *sql.Tx, store entity.Store) error
 	Delete(ctx context.Context, tx *sql.Tx, store entity.Store) error
+	FindByUser(ctx context.Context, tx *sql.Tx, user entity.User) (entity.Store, error)
 }

@@ -54,3 +54,15 @@ func (service *StoreServiceImpl) Create(ctx context.Context, request dto.StoreCr
 	logger.Logging().Info("Success create new store : " + store.Name.String)
 	return dto.StoreCreateResponse{Name: store.Name.String, Message: "Success create new store"}
 }
+
+func (service *StoreServiceImpl) Delete(ctx context.Context, token string) dto.StoreCreateResponse {
+	tx, errSQL := service.DB.Begin()
+	helper.IfPanicError(errSQL)
+	defer helper.CommitOrRollback(tx)
+
+	user, _ := service.UserRepository.FindFirstByToken(ctx, tx, token)
+	logger.Logging().Info("Request from Store : " + user.Username + " call Delete func in StoreService")
+
+	return dto.StoreCreateResponse{}
+
+}
