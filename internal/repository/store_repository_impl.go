@@ -39,3 +39,13 @@ func (repository *StoreRepositoryImpl) Insert(ctx context.Context, tx *sql.Tx, s
 	logger.Logging().Info("Success create store : " + store.Name.String)
 	return nil
 }
+
+func (repository *StoreRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, store entity.Store) error {
+	SQL := "delete from stores where store_id = ?"
+	_, err := tx.ExecContext(ctx, SQL, store.StoreId)
+	if err != nil {
+		logger.Logging().Error(err)
+		return err
+	}
+	return nil
+}
