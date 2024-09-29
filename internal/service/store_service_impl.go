@@ -63,6 +63,13 @@ func (service *StoreServiceImpl) Delete(ctx context.Context, token string) dto.S
 	user, _ := service.UserRepository.FindFirstByToken(ctx, tx, token)
 	logger.Logging().Info("Request from Store : " + user.Username + " call Delete func in StoreService")
 
-	return dto.StoreCreateResponse{}
+	storeResult, _ := service.StoreRepository.FindByUser(ctx, tx, user)
+	err := service.StoreRepository.Delete(ctx, tx, storeResult)
+	helper.IfPanicError(err)
+
+	return dto.StoreCreateResponse{
+		Name:    storeResult.Name.String,
+		Message: "Success Delete Store",
+	}
 
 }
