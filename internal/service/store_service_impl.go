@@ -73,3 +73,24 @@ func (service *StoreServiceImpl) Delete(ctx context.Context, token string) dto.S
 	}
 
 }
+
+func (service *StoreServiceImpl) FindByUser(ctx context.Context, token string) dto.StoreGetResponse {
+	tx, errSQL := service.DB.Begin()
+	helper.IfPanicError(errSQL)
+	defer helper.CommitOrRollback(tx)
+
+	user, _ := service.UserRepository.FindFirstByToken(ctx, tx, token)
+	logger.Logging().Info("Request from Store : " + user.Username + " call FindByUser func in StoreService")
+
+	storeResult, err := service.StoreRepository.FindByUser(ctx, tx, user)
+	helper.IfPanicError(err)
+
+	return dto.StoreGetResponse{
+		Id:          storeResult.StoreId,
+		Name:        storeResult.Name.String,
+		Logo:        storeResult.Logo,
+		Description: storeResult.Description,
+		NoTelepon:   storeResult.NoTelepon,
+		Email:       user.Email,
+	}
+}

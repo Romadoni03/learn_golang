@@ -42,3 +42,17 @@ func (handler *StoreHandlerImpl) Delete(writer http.ResponseWriter, request *htt
 
 	helper.WriteToResponseBody(writer, webResponse)
 }
+
+func (handler *StoreHandlerImpl) FindByUser(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	token := request.Header.Get("API-KEY")
+
+	result := handler.StoreService.FindByUser(request.Context(), token)
+
+	webResponse := dto.WebResponse{
+		Code:   http.StatusOK,
+		Status: "OK",
+		Data:   result,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}

@@ -26,7 +26,7 @@ func setUpDB() *sql.DB {
 }
 
 func truncateUser(db *sql.DB) {
-	db.Exec("TRUNCATE users")
+	db.Exec("DELETE from users")
 }
 
 func TestInsert(t *testing.T) {

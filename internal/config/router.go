@@ -18,6 +18,7 @@ func NewRouter(userHandler handler.UserHandler, storeHandler handler.StoreHandle
 	router.PATCH("/api/users/profile", middleware.AuthMiddleware(userHandler.Update))
 	router.POST("/api/stores", middleware.AuthMiddleware(storeHandler.Create))
 	router.DELETE("/api/stores", middleware.AuthMiddleware(storeHandler.Delete))
+	router.GET("/api/stores", middleware.AuthMiddleware(storeHandler.FindByUser))
 
 	router.PanicHandler = exception.ErrorHandler
 
