@@ -622,9 +622,48 @@
                                         "data": {
                                             "type": "object",
                                             "properties": {
-                                                "message": {
+                                                "id": {
+                                                    "type": "number"
+                                                },
+                                                "photo": {
                                                     "type": "string"
-                                                }
+                                                   },
+                                                   "name": {
+                                                    "type": "string"
+                                                   },
+                                                   "category": {
+                                                    "type": "string"
+                                                   },
+                                                   "description": {
+                                                    "type": "string"
+                                                   },
+                                                   "dangerius_product": {
+                                                    "type": "string"
+                                                   },
+                                                   "price": {
+                                                    "type": "number"
+                                                   },
+                                                   "stock": {
+                                                    "type": "integer"
+                                                   },
+                                                   "wholesaler": {
+                                                    "type": "number"
+                                                   },
+                                                   "shipping_cost": {
+                                                    "type": "number"
+                                                   },
+                                                   "shipping_insurance": {
+                                                    "type": "string"
+                                                   },
+                                                   "condition": {
+                                                    "type": "string"
+                                                   },
+                                                   "pre_order": {
+                                                    "type": "string"
+                                                   },
+                                                   "status": {
+                                                    "type": "string"
+                                                   }
                                             }
                                         }
                                     }
