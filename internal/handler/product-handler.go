@@ -19,12 +19,12 @@ func (handler *ProductHandler) Create(writer http.ResponseWriter, request *http.
 	productRequest := dto.ProductCreateUpdateRequest{}
 	helper.ReadFromRequestBody(request, &productRequest)
 
-	result := handler.ProductService.Create(request.Context(), productRequest, token)
-	logger.LogHandler(request).Info(result)
+	productResponse := handler.ProductService.Create(request.Context(), productRequest, token)
+	logger.LogHandler(request).Info(productResponse)
 	webResponse := dto.WebResponse{
 		Code:   http.StatusOK,
 		Status: "OK",
-		Data:   result,
+		Data:   productResponse,
 	}
 
 	helper.WriteToResponseBody(writer, webResponse)
@@ -41,5 +41,32 @@ func (handler *ProductHandler) FindAll(writer http.ResponseWriter, request *http
 	}
 
 	helper.WriteToResponseBody(writer, webResponse)
+}
 
+func (handler *ProductHandler) FindById(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	productId := params.ByName("productId")
+
+	productResponse := handler.ProductService.FindById(request.Context(), productId)
+	webResponse := dto.WebResponse{
+		Code:   http.StatusOK,
+		Status: "OK",
+		Data:   productResponse,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}
+
+func (handler *ProductHandler) Update(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	productId := params.ByName("productId")
+	productRequest := dto.ProductCreateUpdateRequest{}
+	helper.ReadFromRequestBody(request, &productRequest)
+
+	productResponse := handler.ProductService.Update(request.Context(), productRequest, productId)
+	webResponse := dto.WebResponse{
+		Code:   http.StatusOK,
+		Status: "OK",
+		Data:   productResponse,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
 }

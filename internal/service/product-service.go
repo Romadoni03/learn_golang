@@ -54,7 +54,7 @@ func (service *ProductService) Create(ctx context.Context, request dto.ProductCr
 		Price:             decimal.NewFromInt(request.Price),
 		Stock:             request.Stock,
 		Wholesaler:        request.Wholesaler,
-		ShippingCost:      request.ShippingCost,
+		ShippingCost:      decimal.NewFromInt(request.ShippingCost),
 		ShippingInsurance: request.ShippingInsurance,
 		Conditions:        request.Conditions,
 		PreOrder:          request.PreOrder,
@@ -123,4 +123,94 @@ func (service *ProductService) FindAll(ctx context.Context, token string) []dto.
 	}
 
 	return productResponses
+}
+
+func (service *ProductService) FindById(ctx context.Context, productId string) dto.ProductCreateUpdateResponse {
+	tx, errSQL := service.DB.Begin()
+	if errSQL != nil {
+		logger.Logging().Error(errSQL)
+		panic(exception.NewInternalServerError("internal server error"))
+	}
+	defer helper.CommitOrRollback(tx)
+
+	logger.Logging().Info("Request from Product : " + productId + " call FindById func in ProductService")
+	product, err := service.ProductRepository.FindById(ctx, tx, productId)
+	if err != nil {
+		logger.Logging().Error(err)
+		panic(exception.NewNotFoundError("product is not found"))
+	}
+
+	return dto.ProductCreateUpdateResponse{
+		Id:                product.Id,
+		PhotoProduct:      product.PhotoProduct,
+		Name:              product.Name,
+		Category:          product.Category,
+		Description:       product.Description,
+		DangeriousProduct: product.DangeriousProduct,
+		Price:             product.Price,
+		Stock:             product.Stock,
+		Wholesaler:        product.Wholesaler,
+		ShippingCost:      product.ShippingCost,
+		ShippingInsurance: product.ShippingInsurance,
+		Conditions:        product.Conditions,
+		PreOrder:          product.PreOrder,
+		Status:            product.Status,
+	}
+}
+
+func (service *ProductService) Update(ctx context.Context, request dto.ProductCreateUpdateRequest, productId string) dto.ProductCreateUpdateResponse {
+	logger.Logging().Info("Request from Product : " + request.Name + " call Update function")
+	errValidate := service.Validate.Struct(request)
+	if errValidate != nil {
+		logger.Logging().Error("Err :" + errValidate.Error() + "field can not be null")
+		panic(exception.NewValidationError("field can not be null"))
+	}
+
+	tx, errSQL := service.DB.Begin()
+	if errSQL != nil {
+		logger.Logging().Error(errSQL)
+		panic(exception.NewInternalServerError("internal server error"))
+	}
+	defer helper.CommitOrRollback(tx)
+
+	product, errProduct := service.ProductRepository.FindById(ctx, tx, productId)
+	if errProduct != nil {
+		logger.Logging().Error("Err :" + errProduct.Error())
+		panic(exception.NewNotFoundError("product is not found"))
+	}
+
+	product.PhotoProduct = request.PhotoProduct
+	product.Name = request.Name
+	product.Category = request.Category
+	product.Description = request.Description
+	product.DangeriousProduct = request.DangeriousProduct
+	product.Price = decimal.NewFromInt(request.Price)
+	product.Stock = request.Stock
+	product.Wholesaler = request.Wholesaler
+	product.ShippingCost = decimal.NewFromInt(request.ShippingCost)
+	product.ShippingInsurance = request.ShippingInsurance
+	product.Conditions = request.Conditions
+	product.PreOrder = request.PreOrder
+	product.Status = request.Status
+	product.LastUpdatedAt = helper.GeneratedTimeNow()
+
+	productResult := service.ProductRepository.Update(ctx, tx, product)
+
+	return dto.ProductCreateUpdateResponse{
+		Id:                productResult.Id,
+		PhotoProduct:      productResult.PhotoProduct,
+		Name:              productResult.Name,
+		Category:          productResult.Category,
+		Description:       productResult.Description,
+		DangeriousProduct: productResult.DangeriousProduct,
+		Price:             productResult.Price,
+		Stock:             productResult.Stock,
+		Wholesaler:        productResult.Wholesaler,
+		ShippingCost:      productResult.ShippingCost,
+		ShippingInsurance: productResult.ShippingInsurance,
+		Conditions:        productResult.Conditions,
+		PreOrder:          productResult.PreOrder,
+		Status:            productResult.Status,
+	}
+
 }

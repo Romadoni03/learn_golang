@@ -17,7 +17,7 @@ type Product struct {
 	Price             decimal.Decimal
 	Stock             int
 	Wholesaler        string
-	ShippingCost      int
+	ShippingCost      decimal.Decimal
 	ShippingInsurance int
 	Conditions        string
 	PreOrder          string
