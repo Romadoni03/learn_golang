@@ -29,3 +29,17 @@ func (handler *ProductHandler) Create(writer http.ResponseWriter, request *http.
 
 	helper.WriteToResponseBody(writer, webResponse)
 }
+
+func (handler *ProductHandler) FindAll(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	token := request.Header.Get("API-KEY")
+
+	productResponses := handler.ProductService.FindAll(request.Context(), token)
+	webResponse := dto.WebResponse{
+		Code:   http.StatusOK,
+		Status: "OK",
+		Data:   productResponses,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+
+}

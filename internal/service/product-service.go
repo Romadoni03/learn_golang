@@ -12,6 +12,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
 )
 
 type ProductService struct {
@@ -50,7 +51,7 @@ func (service *ProductService) Create(ctx context.Context, request dto.ProductCr
 		Category:          request.Category,
 		Description:       request.Description,
 		DangeriousProduct: request.DangeriousProduct,
-		Price:             request.Price,
+		Price:             decimal.NewFromInt(request.Price),
 		Stock:             request.Stock,
 		Wholesaler:        request.Wholesaler,
 		ShippingCost:      request.ShippingCost,
@@ -81,4 +82,45 @@ func (service *ProductService) Create(ctx context.Context, request dto.ProductCr
 		PreOrder:          product.PreOrder,
 		Status:            product.Status,
 	}
+}
+
+func (service *ProductService) FindAll(ctx context.Context, token string) []dto.ProductRespone {
+	tx, errSQL := service.DB.Begin()
+	if errSQL != nil {
+		logger.Logging().Error(errSQL)
+		panic(exception.NewInternalServerError("internal server error"))
+	}
+	defer helper.CommitOrRollback(tx)
+
+	user, errUser := service.UserRepository.FindFirstByToken(ctx, tx, token)
+	if errUser != nil {
+		logger.Logging().Error(errUser)
+		panic(exception.NewInternalServerError("user by token " + token + "is not found"))
+	}
+	logger.Logging().Info("Request from Product : " + user.Username + " call FindAll func in ProductService")
+
+	store, errStore := service.StoreRepository.FindByUser(ctx, tx, user)
+	if errStore != nil {
+		logger.Logging().Error(errStore)
+		panic(exception.NewInternalServerError("store by username " + user.Username + "is not found"))
+	}
+
+	products := service.ProductRepository.FindAll(ctx, tx, store)
+	if products == nil {
+		logger.Logging().Warning("product is empty")
+		panic(exception.NewNotFoundError("product is empty"))
+	}
+
+	var productResponses []dto.ProductRespone
+	for _, product := range products {
+		productResponses = append(productResponses, dto.ProductRespone{
+			Id:         product.Id,
+			Name:       product.Name,
+			Wholesaler: product.Wholesaler,
+			Price:      product.Price,
+			Stock:      product.Stock,
+		})
+	}
+
+	return productResponses
 }

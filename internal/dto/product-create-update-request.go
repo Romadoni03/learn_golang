@@ -6,7 +6,7 @@ type ProductCreateUpdateRequest struct {
 	Category          string `validate:"required" json:"category"`
 	Description       string `validate:"required" json:"description"`
 	DangeriousProduct string `validate:"required" json:"dangerious_product"`
-	Price             int    `validate:"required" json:"price"`
+	Price             int64  `validate:"required" json:"price"`
 	Stock             int    `validate:"required" json:"stock"`
 	Wholesaler        string `validate:"required" json:"wholesaler"`
 	ShippingCost      int    `validate:"required" json:"shipping_cost"`

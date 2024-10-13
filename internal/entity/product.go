@@ -1,6 +1,10 @@
 package entity
 
-import "time"
+import (
+	"time"
+
+	"github.com/shopspring/decimal"
+)
 
 type Product struct {
 	Id                string
@@ -10,7 +14,7 @@ type Product struct {
 	Category          string
 	Description       string
 	DangeriousProduct string
-	Price             int
+	Price             decimal.Decimal
 	Stock             int
 	Wholesaler        string
 	ShippingCost      int

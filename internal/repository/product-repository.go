@@ -24,3 +24,26 @@ func (repository *ProductRepository) Insert(ctx context.Context, tx *sql.Tx, pro
 	return nil
 
 }
+
+func (repository *ProductRepository) FindAll(ctx context.Context, tx *sql.Tx, store entity.Store) []entity.Product {
+	SQL := "select id, name, wholesaler, price, stock from products where products.store_id = ?"
+
+	rows, err := tx.QueryContext(ctx, SQL, store.StoreId)
+	if err != nil {
+		logger.Logging().Error(err)
+		return []entity.Product{}
+	}
+	defer rows.Close()
+
+	var products []entity.Product
+	for rows.Next() {
+		product := entity.Product{}
+		err := rows.Scan(&product.Id, &product.Name, &product.Wholesaler, &product.Price, &product.Stock)
+		if err != nil {
+			logger.Logging().Error(err)
+			return []entity.Product{}
+		}
+		products = append(products, product)
+	}
+	return products
+}
