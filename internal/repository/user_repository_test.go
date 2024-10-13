@@ -50,7 +50,7 @@ func TestInsert(t *testing.T) {
 		TokenExpiredAt:      0,
 	}
 
-	repository := repository.UserRepositoryImpl{}
+	repository := repository.UserRepository{}
 	tx, err := db.Begin()
 	helper.IfPanicError(err)
 	defer helper.CommitOrRollback(tx)
@@ -70,7 +70,7 @@ func TestFindFirstByToken(t *testing.T) {
 	db := setUpDB()
 	truncateUser(db)
 
-	repository := repository.UserRepositoryImpl{}
+	repository := repository.UserRepository{}
 	tx, err := db.Begin()
 	helper.IfPanicError(err)
 	defer helper.CommitOrRollback(tx)
@@ -87,7 +87,7 @@ func TestUserProfile(t *testing.T) {
 	db := setUpDB()
 	truncateUser(db)
 
-	repository := repository.UserRepositoryImpl{}
+	repository := repository.UserRepository{}
 	tx, err := db.Begin()
 	helper.IfPanicError(err)
 	defer helper.CommitOrRollback(tx)
@@ -104,7 +104,7 @@ func TestUserProfile(t *testing.T) {
 // 	db := setUpDB()
 // 	truncateUser(db)
 
-// 	repository := repository.UserRepositoryImpl{}
+// 	repository := repository.UserRepository{}
 // 	tx, err := db.Begin()
 // 	helper.IfPanicError(err)
 // 	defer helper.CommitOrRollback(tx)

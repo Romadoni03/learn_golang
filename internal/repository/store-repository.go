@@ -9,10 +9,10 @@ import (
 	"errors"
 )
 
-type StoreRepositoryImpl struct {
+type StoreRepository struct {
 }
 
-func (repository *StoreRepositoryImpl) Insert(ctx context.Context, tx *sql.Tx, store entity.Store) error {
+func (repository *StoreRepository) Insert(ctx context.Context, tx *sql.Tx, store entity.Store) error {
 	SQL := "insert into stores(store_id, no_telepon, name, last_updated_name, logo, description, status, link_store, total_comment, total_following, total_follower, total_product, conditions, created_at) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 
 	_, err := tx.ExecContext(
@@ -42,7 +42,7 @@ func (repository *StoreRepositoryImpl) Insert(ctx context.Context, tx *sql.Tx, s
 	return nil
 }
 
-func (repository *StoreRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, store entity.Store) error {
+func (repository *StoreRepository) Delete(ctx context.Context, tx *sql.Tx, store entity.Store) error {
 	SQL := "delete from stores where store_id = ?"
 	_, err := tx.ExecContext(ctx, SQL, store.StoreId)
 	if err != nil {
@@ -52,7 +52,7 @@ func (repository *StoreRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, s
 	return nil
 }
 
-func (repository *StoreRepositoryImpl) FindByUser(ctx context.Context, tx *sql.Tx, user entity.User) (entity.Store, error) {
+func (repository *StoreRepository) FindByUser(ctx context.Context, tx *sql.Tx, user entity.User) (entity.Store, error) {
 	SQL := "select store_id, no_telepon, name, last_updated_name, logo, description, status, link_store, total_comment, total_following, total_follower, total_product, conditions, created_at from stores where no_telepon = ?"
 
 	rows, err := tx.QueryContext(ctx, SQL, user.NoTelepon)

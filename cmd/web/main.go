@@ -18,17 +18,21 @@ func main() {
 	db, _ := config.NewDB()
 	validate := validator.New()
 	//user
-	userRepository := repository.UserRepositoryImpl{}
-	userService := service.UserServiceImpl{UserRepository: &userRepository, DB: db, Validate: validate}
-	userHandler := handler.UserHandlerImpl{UserService: &userService}
+	userRepository := repository.UserRepository{}
+	userService := service.UserService{UserRepository: &userRepository, DB: db, Validate: validate}
+	userHandler := handler.UserHandler{UserService: &userService}
 	//store
-	storeRepository := repository.StoreRepositoryImpl{}
-	storeService := service.StoreServiceImpl{StoreRepository: &storeRepository, UserRepository: &userRepository, DB: db, Validate: validate}
-	storeHandler := handler.StoreHandlerImpl{StoreService: &storeService}
+	storeRepository := repository.StoreRepository{}
+	storeService := service.StoreService{StoreRepository: &storeRepository, UserRepository: &userRepository, DB: db, Validate: validate}
+	storeHandler := handler.StoreHandler{StoreService: &storeService}
+	//product
+	productRepository := repository.ProductRepository{}
+	productService := service.ProductService{ProductRepository: &productRepository, StoreRepository: &storeRepository, UserRepository: &userRepository, DB: db, Validate: validate}
+	productHandler := handler.ProductHandler{ProductService: &productService}
 	//middleware
 	middleware := middleware.AuthMiddleware{UserRepository: &userRepository, DB: db}
 
-	router := config.NewRouter(&userHandler, &storeHandler, middleware)
+	router := config.NewRouter(&userHandler, &storeHandler, &productHandler, middleware)
 
 	server := http.Server{
 		Addr:    "localhost:3000",

@@ -10,17 +10,16 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-type UserHandlerImpl struct {
-	UserService service.UserService
+type UserHandler struct {
+	UserService *service.UserService
 }
 
-func (handler *UserHandlerImpl) Create(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+func (handler *UserHandler) Create(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	logger.LogHandler(request).Info("Incoming Request")
 	userCreateRequest := dto.UserCreateRequest{}
 	helper.ReadFromRequestBody(request, &userCreateRequest)
 
-	userResponse, err := handler.UserService.Create(request.Context(), userCreateRequest)
-	helper.PanicWithMessage(err, userResponse)
+	userResponse := handler.UserService.Create(request.Context(), userCreateRequest)
 	logger.LogHandler(request).Info(userResponse)
 
 	webResponse := dto.WebResponse{
@@ -33,12 +32,12 @@ func (handler *UserHandlerImpl) Create(writer http.ResponseWriter, request *http
 
 }
 
-func (handler *UserHandlerImpl) Login(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+func (handler *UserHandler) Login(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	logger.LogHandler(request).Info("Incoming Request")
-	userLogin := dto.UserCreateRequest{}
-	helper.ReadFromRequestBody(request, &userLogin)
+	loginRequest := dto.UserCreateRequest{}
+	helper.ReadFromRequestBody(request, &loginRequest)
 
-	userResponse := handler.UserService.Login(request.Context(), userLogin)
+	userResponse := handler.UserService.Login(request.Context(), loginRequest)
 	logger.LogHandler(request).Info(userResponse)
 	webResponse := dto.WebResponse{
 		Code:   http.StatusOK,
@@ -49,7 +48,7 @@ func (handler *UserHandlerImpl) Login(writer http.ResponseWriter, request *http.
 	helper.WriteToResponseBody(writer, webResponse)
 }
 
-func (handler *UserHandlerImpl) Logout(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+func (handler *UserHandler) Logout(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	message := handler.UserService.Logout(request.Context(), request)
 	webResponse := dto.WebResponse{
 		Code:   http.StatusOK,
@@ -60,7 +59,7 @@ func (handler *UserHandlerImpl) Logout(writer http.ResponseWriter, request *http
 	helper.WriteToResponseBody(writer, webResponse)
 }
 
-func (handler *UserHandlerImpl) GetByToken(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+func (handler *UserHandler) GetByToken(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	userResponse := handler.UserService.GetByToken(request.Context(), request)
 	webResponse := dto.WebResponse{
 		Code:   http.StatusOK,
@@ -71,7 +70,7 @@ func (handler *UserHandlerImpl) GetByToken(writer http.ResponseWriter, request *
 	helper.WriteToResponseBody(writer, webResponse)
 }
 
-func (handler *UserHandlerImpl) Update(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+func (handler *UserHandler) Update(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	userUpdateRequest := dto.UserUpdateRequest{}
 	helper.ReadFromRequestBody(request, &userUpdateRequest)
 

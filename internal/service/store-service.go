@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"ecommerce-cloning-app/internal/dto"
 	"ecommerce-cloning-app/internal/entity"
+	"ecommerce-cloning-app/internal/exception"
 	"ecommerce-cloning-app/internal/helper"
 	"ecommerce-cloning-app/internal/logger"
 	"ecommerce-cloning-app/internal/repository"
@@ -13,14 +14,14 @@ import (
 	"github.com/google/uuid"
 )
 
-type StoreServiceImpl struct {
-	StoreRepository repository.StoreRepository
-	UserRepository  repository.UserRepository
+type StoreService struct {
+	StoreRepository *repository.StoreRepository
+	UserRepository  *repository.UserRepository
 	DB              *sql.DB
 	Validate        *validator.Validate
 }
 
-func (service *StoreServiceImpl) Create(ctx context.Context, request dto.StoreCreateRequest, token string) dto.StoreCreateResponse {
+func (service *StoreService) Create(ctx context.Context, request dto.StoreCreateRequest, token string) dto.StoreCreateResponse {
 	logger.Logging().Info("Request from Store : " + request.Name + " call Create func in StoreService")
 	errValidate := service.Validate.Struct(request)
 	helper.IfPanicError(errValidate)
@@ -29,7 +30,11 @@ func (service *StoreServiceImpl) Create(ctx context.Context, request dto.StoreCr
 	helper.IfPanicError(errSQL)
 	defer helper.CommitOrRollback(tx)
 
-	user, _ := service.UserRepository.FindFirstByToken(ctx, tx, token)
+	user, errCheckToken := service.UserRepository.FindFirstByToken(ctx, tx, token)
+	if errCheckToken != nil {
+		logger.Logging().Error("Err :" + errCheckToken.Error() + "user whith token " + token + " is not found")
+		panic(exception.NewNotFoundError("user whith token " + token + " is not found"))
+	}
 
 	store := entity.Store{
 		StoreId:         uuid.NewString(),
@@ -48,14 +53,17 @@ func (service *StoreServiceImpl) Create(ctx context.Context, request dto.StoreCr
 		CreatedAt:       helper.GeneratedTimeNow(),
 	}
 
-	err := service.StoreRepository.Insert(ctx, tx, store)
-	helper.PanicWithMessage(err, "failed to create new store")
+	errService := service.StoreRepository.Insert(ctx, tx, store)
+	if errService != nil {
+		logger.Logging().Error(errService)
+		panic(exception.NewInternalServerError("failed to create new store"))
+	}
 
 	logger.Logging().Info("Success create new store : " + store.Name.String)
 	return dto.StoreCreateResponse{Name: store.Name.String, Message: "Success create new store"}
 }
 
-func (service *StoreServiceImpl) Delete(ctx context.Context, token string) dto.StoreCreateResponse {
+func (service *StoreService) Delete(ctx context.Context, token string) dto.StoreCreateResponse {
 	tx, errSQL := service.DB.Begin()
 	helper.IfPanicError(errSQL)
 	defer helper.CommitOrRollback(tx)
@@ -74,7 +82,7 @@ func (service *StoreServiceImpl) Delete(ctx context.Context, token string) dto.S
 
 }
 
-func (service *StoreServiceImpl) FindByUser(ctx context.Context, token string) dto.StoreGetResponse {
+func (service *StoreService) FindByUser(ctx context.Context, token string) dto.StoreGetResponse {
 	tx, errSQL := service.DB.Begin()
 	helper.IfPanicError(errSQL)
 	defer helper.CommitOrRollback(tx)

@@ -41,15 +41,18 @@ func setUpDB() *sql.DB {
 
 func setupRouter(db *sql.DB) *httprouter.Router {
 	validate := validator.New()
-	userRepository := repository.UserRepositoryImpl{}
-	userService := service.UserServiceImpl{UserRepository: &userRepository, DB: db, Validate: validate}
-	userHandler := handler.UserHandlerImpl{UserService: &userService}
-	storeRepository := repository.StoreRepositoryImpl{}
-	storeService := service.StoreServiceImpl{StoreRepository: &storeRepository, UserRepository: &userRepository, DB: db, Validate: validate}
-	storeHandler := handler.StoreHandlerImpl{StoreService: &storeService}
+	userRepository := repository.UserRepository{}
+	userService := service.UserService{UserRepository: &userRepository, DB: db, Validate: validate}
+	userHandler := handler.UserHandler{UserService: &userService}
+	storeRepository := repository.StoreRepository{}
+	storeService := service.StoreService{StoreRepository: &storeRepository, UserRepository: &userRepository, DB: db, Validate: validate}
+	storeHandler := handler.StoreHandler{StoreService: &storeService}
+	productRepository := repository.ProductRepository{}
+	productService := service.ProductService{ProductRepository: &productRepository, StoreRepository: &storeRepository, UserRepository: &userRepository, DB: db, Validate: validate}
+	productHandler := handler.ProductHandler{ProductService: &productService}
 	middleware := middleware.AuthMiddleware{UserRepository: &userRepository, DB: db}
 
-	router := config.NewRouter(&userHandler, &storeHandler, middleware)
+	router := config.NewRouter(&userHandler, &storeHandler, &productHandler, middleware)
 
 	return router
 
@@ -114,7 +117,7 @@ func TestLoginSuccess(t *testing.T) {
 	truncateUser(db)
 
 	tx, _ := db.Begin()
-	repository := repository.UserRepositoryImpl{}
+	repository := repository.UserRepository{}
 	user := entity.User{
 		NoTelepon:           "083156490686",
 		Password:            helper.HashingPassword("rahasia"),
@@ -162,7 +165,7 @@ func TestLoginFailed(t *testing.T) {
 	truncateUser(db)
 
 	tx, _ := db.Begin()
-	repository := repository.UserRepositoryImpl{}
+	repository := repository.UserRepository{}
 	user := entity.User{
 		NoTelepon:           "083156490686",
 		Password:            helper.HashingPassword("rahasia"),
@@ -209,9 +212,9 @@ func TestLogoutSuccess(t *testing.T) {
 	db := setUpDB()
 	truncateUser(db)
 	tx, _ := db.Begin()
-	repository := repository.UserRepositoryImpl{}
+	repository := repository.UserRepository{}
 	validate := validator.New()
-	service := service.UserServiceImpl{DB: db, UserRepository: &repository, Validate: validate}
+	service := service.UserService{DB: db, UserRepository: &repository, Validate: validate}
 	user := entity.User{
 		NoTelepon:           "083156490686",
 		Password:            helper.HashingPassword("rahasia"),
@@ -260,9 +263,9 @@ func TestGetByToken(t *testing.T) {
 	db := setUpDB()
 	truncateUser(db)
 	tx, _ := db.Begin()
-	repository := repository.UserRepositoryImpl{}
+	repository := repository.UserRepository{}
 	validate := validator.New()
-	service := service.UserServiceImpl{DB: db, UserRepository: &repository, Validate: validate}
+	service := service.UserService{DB: db, UserRepository: &repository, Validate: validate}
 	user := entity.User{
 		NoTelepon:           "083156490686",
 		Password:            helper.HashingPassword("rahasia"),
@@ -310,9 +313,9 @@ func TestUpdateprofileFailed(t *testing.T) {
 	db := setUpDB()
 	truncateUser(db)
 	tx, _ := db.Begin()
-	repository := repository.UserRepositoryImpl{}
+	repository := repository.UserRepository{}
 	validate := validator.New()
-	service := service.UserServiceImpl{DB: db, UserRepository: &repository, Validate: validate}
+	service := service.UserService{DB: db, UserRepository: &repository, Validate: validate}
 	user := entity.User{
 		NoTelepon:           "083156490686",
 		Password:            helper.HashingPassword("rahasia"),

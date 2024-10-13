@@ -29,9 +29,9 @@ func TestCreateStoreSuccess(t *testing.T) {
 	truncateStores(db)
 	truncateUser(db)
 	tx, _ := db.Begin()
-	repository := repository.UserRepositoryImpl{}
+	repository := repository.UserRepository{}
 	validate := validator.New()
-	service := service.UserServiceImpl{DB: db, UserRepository: &repository, Validate: validate}
+	service := service.UserService{DB: db, UserRepository: &repository, Validate: validate}
 	user := entity.User{
 		NoTelepon:           "083156490686",
 		Password:            helper.HashingPassword("rahasia"),
@@ -78,10 +78,10 @@ func TestDeleteStoreSuccess(t *testing.T) {
 	truncateUser(db)
 	tx, _ := db.Begin()
 	validate := validator.New()
-	userRepository := repository.UserRepositoryImpl{}
-	storeRepository := repository.StoreRepositoryImpl{}
-	userService := service.UserServiceImpl{DB: db, UserRepository: &userRepository, Validate: validate}
-	storeService := service.StoreServiceImpl{DB: db, UserRepository: &userRepository, StoreRepository: &storeRepository, Validate: validate}
+	userRepository := repository.UserRepository{}
+	storeRepository := repository.StoreRepository{}
+	userService := service.UserService{DB: db, UserRepository: &userRepository, Validate: validate}
+	storeService := service.StoreService{DB: db, UserRepository: &userRepository, StoreRepository: &storeRepository, Validate: validate}
 	user := entity.User{
 		NoTelepon:           "082332271835",
 		Password:            helper.HashingPassword("rahasia"),
@@ -130,10 +130,10 @@ func TestFindByUser(t *testing.T) {
 	truncateUser(db)
 	tx, _ := db.Begin()
 	validate := validator.New()
-	userRepository := repository.UserRepositoryImpl{}
-	storeRepository := repository.StoreRepositoryImpl{}
-	userService := service.UserServiceImpl{DB: db, UserRepository: &userRepository, Validate: validate}
-	storeService := service.StoreServiceImpl{DB: db, UserRepository: &userRepository, StoreRepository: &storeRepository, Validate: validate}
+	userRepository := repository.UserRepository{}
+	storeRepository := repository.StoreRepository{}
+	userService := service.UserService{DB: db, UserRepository: &userRepository, Validate: validate}
+	storeService := service.StoreService{DB: db, UserRepository: &userRepository, StoreRepository: &storeRepository, Validate: validate}
 	user := entity.User{
 		NoTelepon:           "083156490686",
 		Password:            helper.HashingPassword("rahasia"),

@@ -8,7 +8,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func NewRouter(userHandler handler.UserHandler, storeHandler handler.StoreHandler, middleware middleware.AuthMiddleware) *httprouter.Router {
+func NewRouter(userHandler *handler.UserHandler, storeHandler *handler.StoreHandler, productHandler *handler.ProductHandler, middleware middleware.AuthMiddleware) *httprouter.Router {
 	router := httprouter.New()
 
 	router.POST("/api/users", userHandler.Create)
@@ -19,6 +19,7 @@ func NewRouter(userHandler handler.UserHandler, storeHandler handler.StoreHandle
 	router.POST("/api/stores", middleware.AuthMiddleware(storeHandler.Create))
 	router.DELETE("/api/stores", middleware.AuthMiddleware(storeHandler.Delete))
 	router.GET("/api/stores", middleware.AuthMiddleware(storeHandler.FindByUser))
+	router.POST("/api/stores/products", middleware.AuthMiddleware(productHandler.Create))
 
 	router.PanicHandler = exception.ErrorHandler
 

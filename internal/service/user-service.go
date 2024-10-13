@@ -9,7 +9,6 @@ import (
 	"ecommerce-cloning-app/internal/helper"
 	"ecommerce-cloning-app/internal/logger"
 	"ecommerce-cloning-app/internal/repository"
-	"errors"
 	"net/http"
 	"time"
 
@@ -17,16 +16,19 @@ import (
 	"github.com/google/uuid"
 )
 
-type UserServiceImpl struct {
-	UserRepository repository.UserRepository
+type UserService struct {
+	UserRepository *repository.UserRepository
 	DB             *sql.DB
 	Validate       *validator.Validate
 }
 
-func (service *UserServiceImpl) Create(ctx context.Context, request dto.UserCreateRequest) (string, error) {
+func (service *UserService) Create(ctx context.Context, request dto.UserCreateRequest) string {
 	logger.Logging().Info("request from phone : " + request.NoTelepon + " call Create Func In Service")
 	err := service.Validate.Struct(request)
-	helper.PanicWithMessage(err, "No Telepon or Password can not be null")
+	if err != nil {
+		logger.Logging().Error("Err :" + err.Error() + "username or password can not be null")
+		panic(exception.NewValidationError("username or password can not be null"))
+	}
 
 	tx, err := service.DB.Begin()
 	helper.IfPanicError(err)
@@ -35,7 +37,8 @@ func (service *UserServiceImpl) Create(ctx context.Context, request dto.UserCrea
 	_, errCheck := service.UserRepository.FindByPhone(ctx, tx, request.NoTelepon)
 
 	if errCheck == nil {
-		return "No telepon is already", errors.New("user is already")
+		logger.Logging().Error("user is already")
+		panic(exception.NewInternalServerError("user is already"))
 	}
 
 	user := entity.User{
@@ -56,19 +59,22 @@ func (service *UserServiceImpl) Create(ctx context.Context, request dto.UserCrea
 	}
 
 	errService := service.UserRepository.Insert(ctx, tx, user)
-
 	if errService != nil {
-		return "failed to create new user", errService
-	} else {
-		return "success create new user", nil
+		logger.Logging().Error(errService)
+		panic(exception.NewInternalServerError("failed to create new user"))
 	}
+
+	return "success create new user"
 
 }
 
-func (service *UserServiceImpl) Login(ctx context.Context, request dto.UserCreateRequest) dto.UserLoginResponse {
+func (service *UserService) Login(ctx context.Context, request dto.UserCreateRequest) dto.UserLoginResponse {
 	logger.Logging().Info("request from phone : " + request.NoTelepon + " call Login Func In Service")
 	err := service.Validate.Struct(request)
-	helper.PanicWithMessage(err, "No Telepon and password can not be null")
+	if err != nil {
+		logger.Logging().Error("Err :" + err.Error() + "username or password can not be null")
+		panic(exception.NewValidationError("username or password can not be null"))
+	}
 
 	tx, err := service.DB.Begin()
 	helper.IfPanicError(err)
@@ -79,12 +85,13 @@ func (service *UserServiceImpl) Login(ctx context.Context, request dto.UserCreat
 		logger.Logging().Error("username or password is wrong")
 		panic(exception.NewUnauthorizedError("username or password is wrong"))
 	}
-	errCheckPw := helper.CompiringPassword(data.Password, request.Password)
 
+	errCheckPw := helper.CompiringPassword(data.Password, request.Password)
 	if errCheckPw != nil {
 		logger.Logging().Error("username or password is wrong")
 		panic(exception.NewUnauthorizedError("username or password is wrong"))
 	}
+
 	user := entity.User{
 		Username:       data.Username,
 		NoTelepon:      data.NoTelepon,
@@ -92,7 +99,10 @@ func (service *UserServiceImpl) Login(ctx context.Context, request dto.UserCreat
 		TokenExpiredAt: time.Now().Local().UnixMilli() + (1000 * 60 * 60 * 24 * 7),
 	}
 	errToken := service.UserRepository.UpdateToken(ctx, tx, user)
-	helper.PanicWithMessage(errToken, "failed set token")
+	if errToken != nil {
+		logger.Logging().Error("Failed set Token")
+		panic(exception.NewUnauthorizedError("failed set token"))
+	}
 
 	return dto.UserLoginResponse{
 		NoTelepon:      user.NoTelepon,
@@ -102,20 +112,21 @@ func (service *UserServiceImpl) Login(ctx context.Context, request dto.UserCreat
 	}
 }
 
-func (service *UserServiceImpl) Logout(ctx context.Context, request *http.Request) string {
+func (service *UserService) Logout(ctx context.Context, request *http.Request) string {
 	token := request.Header.Get("API-KEY")
 	tx, err := service.DB.Begin()
 	helper.IfPanicError(err)
 	defer helper.CommitOrRollback(tx)
+
 	errLogout := service.UserRepository.DeleteToken(ctx, tx, token)
 	if errLogout != nil {
-		logger.Logging().Error("failed to logout")
+		logger.Logging().Error("Err : " + errLogout.Error() + "failed to logout")
 		panic(exception.NewUnauthorizedError("failed to logout"))
 	}
 	return "success logout"
 }
 
-func (service *UserServiceImpl) GetByToken(ctx context.Context, request *http.Request) dto.UserProfileResponse {
+func (service *UserService) GetByToken(ctx context.Context, request *http.Request) dto.UserProfileResponse {
 	token := request.Header.Get("API-KEY")
 	tx, err := service.DB.Begin()
 	helper.IfPanicError(err)
@@ -126,7 +137,7 @@ func (service *UserServiceImpl) GetByToken(ctx context.Context, request *http.Re
 
 	user, err := service.UserRepository.GetByToken(ctx, tx, token)
 	if err != nil {
-		logger.Logging().Error("user not found")
+		logger.Logging().Error("Err : " + err.Error() + "user not found")
 		panic(exception.NewNotFoundError("user not found"))
 	}
 	if !user.Store.Name.Valid {
@@ -147,14 +158,14 @@ func (service *UserServiceImpl) GetByToken(ctx context.Context, request *http.Re
 	}
 }
 
-func (service *UserServiceImpl) Update(ctx context.Context, request dto.UserUpdateRequest, token string) dto.UserProfileResponse {
+func (service *UserService) Update(ctx context.Context, request dto.UserUpdateRequest, token string) dto.UserProfileResponse {
 	tx, err := service.DB.Begin()
 	helper.IfPanicError(err)
 	defer helper.CommitOrRollback(tx)
 
 	user, errGetByToken := service.UserRepository.GetByToken(ctx, tx, token)
 	if errGetByToken != nil {
-		logger.Logging().Error("User by token not found")
+		logger.Logging().Error("Err : " + errGetByToken.Error() + "User by token not found")
 		panic(exception.NewNotFoundError("User by token not found"))
 	}
 	//Usernames can only be updated once every 30 days

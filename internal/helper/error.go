@@ -17,3 +17,10 @@ func PanicWithMessage(err error, message string) {
 		panic(err)
 	}
 }
+
+func PanicIfError(err error) error {
+	if err != nil {
+		return err
+	}
+	return nil
+}

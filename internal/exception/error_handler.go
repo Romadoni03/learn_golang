@@ -4,8 +4,6 @@ import (
 	"ecommerce-cloning-app/internal/dto"
 	"ecommerce-cloning-app/internal/helper"
 	"net/http"
-
-	"github.com/go-playground/validator/v10"
 )
 
 func ErrorHandler(writer http.ResponseWriter, request *http.Request, err any) {
@@ -20,12 +18,13 @@ func ErrorHandler(writer http.ResponseWriter, request *http.Request, err any) {
 	if unauthorizedErrors(writer, request, err) {
 		return
 	}
-
-	internalServerErrors(writer, request, err)
+	if internalServerErrors(writer, request, err) {
+		return
+	}
 }
 
 func validationErrors(writer http.ResponseWriter, _ *http.Request, err any) bool {
-	_, ok := err.(validator.ValidationErrors)
+	exception, ok := err.(ValidationError)
 
 	if ok {
 		writer.Header().Set("Content-Type", "application/json")
@@ -34,7 +33,7 @@ func validationErrors(writer http.ResponseWriter, _ *http.Request, err any) bool
 		webResponse := dto.WebResponse{
 			Code:   http.StatusBadRequest,
 			Status: "BAD REQUEST",
-			Data:   map[string]string{"message": "Field can not be null"},
+			Data:   map[string]string{"message": exception.Error},
 		}
 
 		helper.WriteToResponseBody(writer, webResponse)
@@ -85,15 +84,22 @@ func unauthorizedErrors(writer http.ResponseWriter, _ *http.Request, err any) bo
 	}
 }
 
-func internalServerErrors(writer http.ResponseWriter, _ *http.Request, err any) {
-	writer.Header().Set("Content-Type", "application/json")
-	writer.WriteHeader(http.StatusInternalServerError)
+func internalServerErrors(writer http.ResponseWriter, _ *http.Request, err any) bool {
+	exception, ok := err.(InternalServerError)
 
-	webResponse := dto.WebResponse{
-		Code:   http.StatusInternalServerError,
-		Status: "INTERNAL SERVER ERROR",
-		Data:   map[string]any{"message": err},
+	if ok {
+		writer.Header().Set("Content-Type", "application/json")
+		writer.WriteHeader(http.StatusInternalServerError)
+
+		webResponse := dto.WebResponse{
+			Code:   http.StatusInternalServerError,
+			Status: "INTERNAL SERVER ERROR",
+			Data:   map[string]string{"message": exception.Error},
+		}
+		helper.WriteToResponseBody(writer, webResponse)
+
+		return true
+	} else {
+		return false
 	}
-
-	helper.WriteToResponseBody(writer, webResponse)
 }

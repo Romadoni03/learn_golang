@@ -9,11 +9,11 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-type StoreHandlerImpl struct {
-	StoreService service.StoreService
+type StoreHandler struct {
+	StoreService *service.StoreService
 }
 
-func (handler *StoreHandlerImpl) Create(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+func (handler *StoreHandler) Create(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	token := request.Header.Get("API-KEY")
 	storeCreateRequest := dto.StoreCreateRequest{}
 	helper.ReadFromRequestBody(request, &storeCreateRequest)
@@ -29,7 +29,7 @@ func (handler *StoreHandlerImpl) Create(writer http.ResponseWriter, request *htt
 	helper.WriteToResponseBody(writer, webResponse)
 }
 
-func (handler *StoreHandlerImpl) Delete(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+func (handler *StoreHandler) Delete(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	token := request.Header.Get("API-KEY")
 
 	result := handler.StoreService.Delete(request.Context(), token)
@@ -43,7 +43,7 @@ func (handler *StoreHandlerImpl) Delete(writer http.ResponseWriter, request *htt
 	helper.WriteToResponseBody(writer, webResponse)
 }
 
-func (handler *StoreHandlerImpl) FindByUser(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+func (handler *StoreHandler) FindByUser(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	token := request.Header.Get("API-KEY")
 
 	result := handler.StoreService.FindByUser(request.Context(), token)

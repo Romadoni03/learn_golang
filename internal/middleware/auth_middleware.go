@@ -13,7 +13,7 @@ import (
 )
 
 type AuthMiddleware struct {
-	UserRepository repository.UserRepository
+	UserRepository *repository.UserRepository
 	DB             *sql.DB
 }
 
