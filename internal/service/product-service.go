@@ -158,7 +158,7 @@ func (service *ProductService) FindById(ctx context.Context, productId string) d
 	}
 }
 
-func (service *ProductService) Update(ctx context.Context, request dto.ProductCreateUpdateRequest, productId string) dto.ProductCreateUpdateResponse {
+func (service *ProductService) Update(ctx context.Context, request dto.ProductCreateUpdateRequest, productId string, token string) dto.ProductCreateUpdateResponse {
 	logger.Logging().Info("Request from Product : " + request.Name + " call Update function")
 	errValidate := service.Validate.Struct(request)
 	if errValidate != nil {
@@ -172,6 +172,18 @@ func (service *ProductService) Update(ctx context.Context, request dto.ProductCr
 		panic(exception.NewInternalServerError("internal server error"))
 	}
 	defer helper.CommitOrRollback(tx)
+	user, errUser := service.UserRepository.FindFirstByToken(ctx, tx, token)
+	if errUser != nil {
+		logger.Logging().Error(errUser)
+		panic(exception.NewInternalServerError("user by token " + token + "is not found"))
+	}
+	logger.Logging().Info("Request from Product : " + user.Username + " call FindAll func in ProductService")
+
+	store, errStore := service.StoreRepository.FindByUser(ctx, tx, user)
+	if errStore != nil {
+		logger.Logging().Error(errStore)
+		panic(exception.NewInternalServerError("store by username " + user.Username + "is not found"))
+	}
 
 	product, errProduct := service.ProductRepository.FindById(ctx, tx, productId)
 	if errProduct != nil {
@@ -194,7 +206,7 @@ func (service *ProductService) Update(ctx context.Context, request dto.ProductCr
 	product.Status = request.Status
 	product.LastUpdatedAt = helper.GeneratedTimeNow()
 
-	productResult := service.ProductRepository.Update(ctx, tx, product)
+	productResult := service.ProductRepository.Update(ctx, tx, product, store)
 
 	return dto.ProductCreateUpdateResponse{
 		Id:                productResult.Id,
@@ -213,4 +225,40 @@ func (service *ProductService) Update(ctx context.Context, request dto.ProductCr
 		Status:            productResult.Status,
 	}
 
+}
+
+func (service *ProductService) Delete(ctx context.Context, productId, token string) string {
+	tx, errSQL := service.DB.Begin()
+	if errSQL != nil {
+		logger.Logging().Error(errSQL)
+		panic(exception.NewInternalServerError("internal server error"))
+	}
+	defer helper.CommitOrRollback(tx)
+	user, errUser := service.UserRepository.FindFirstByToken(ctx, tx, token)
+	if errUser != nil {
+		logger.Logging().Error(errUser)
+		panic(exception.NewInternalServerError("user by token " + token + "is not found"))
+	}
+	logger.Logging().Info("Request from Product : " + user.Username + " call Delete func in ProductService")
+
+	store, errStore := service.StoreRepository.FindByUser(ctx, tx, user)
+	if errStore != nil {
+		logger.Logging().Error(errStore)
+		panic(exception.NewInternalServerError("store by username " + user.Username + "is not found"))
+	}
+
+	product, errProduct := service.ProductRepository.FindById(ctx, tx, productId)
+	if errProduct != nil {
+		logger.Logging().Error("Err :" + errProduct.Error())
+		panic(exception.NewNotFoundError("product is not found"))
+	}
+
+	logger.Logging().Info("Request from Product : " + productId + " call Delete func in ProductService")
+	err := service.ProductRepository.Delete(ctx, tx, product, store)
+	if err != nil {
+		logger.Logging().Error(err)
+		panic(exception.NewNotFoundError("product is not found"))
+	} else {
+		return "Success delete product :" + product.Name + "with id :" + product.Id
+	}
 }

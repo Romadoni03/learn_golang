@@ -22,7 +22,8 @@ func NewRouter(userHandler *handler.UserHandler, storeHandler *handler.StoreHand
 	router.POST("/api/stores/products", middleware.AuthMiddleware(productHandler.Create))
 	router.GET("/api/stores/products", middleware.AuthMiddleware(productHandler.FindAll))
 	router.GET("/api/stores/products/:productId", middleware.AuthMiddleware(productHandler.FindById))
-	router.PATCH("/api/stores/products/:productId", middleware.AuthMiddleware(productHandler.FindById))
+	router.PATCH("/api/stores/products/:productId", middleware.AuthMiddleware(productHandler.Update))
+	router.DELETE("/api/stores/products/:productId", middleware.AuthMiddleware(productHandler.Delete))
 
 	router.PanicHandler = exception.ErrorHandler
 

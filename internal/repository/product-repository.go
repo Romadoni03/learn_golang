@@ -72,14 +72,24 @@ func (repository *ProductRepository) FindById(ctx context.Context, tx *sql.Tx, p
 	}
 }
 
-func (repository *ProductRepository) Update(ctx context.Context, tx *sql.Tx, product entity.Product) entity.Product {
-	SQL := "UPDATE products SET photo_product = ?,name = ?,category = ?,description = ?,dangerious_product ?,price ?,stock = ?,wholesaler = ?,shipping_cost = ?,shipping_insurance = ?,conditions = ?,pre_order = ?,status = ?,last_updated_at = ? where id = ?"
+func (repository *ProductRepository) Update(ctx context.Context, tx *sql.Tx, product entity.Product, store entity.Store) entity.Product {
+	SQL := "UPDATE products SET photo_product = ?,name = ?,category = ?,description = ?,dangerious_product = ?,price = ?,stock = ?,wholesaler = ?,shipping_cost = ?,shipping_insurance = ?,conditions = ?,pre_order = ?,status = ?,last_updated_at = ? WHERE products.id = ? AND products.store_id = ?"
 
-	_, err := tx.ExecContext(ctx, SQL, product.PhotoProduct, product.Name, product.Category, product.Description, product.DangeriousProduct, product.Price, product.Stock, product.Wholesaler, product.ShippingCost, product.ShippingInsurance, product.Conditions, product.PreOrder, product.Status, product.LastUpdatedAt, product.Id)
+	_, err := tx.ExecContext(ctx, SQL, product.PhotoProduct, product.Name, product.Category, product.Description, product.DangeriousProduct, product.Price, product.Stock, product.Wholesaler, product.ShippingCost, product.ShippingInsurance, product.Conditions, product.PreOrder, product.Status, product.LastUpdatedAt, product.Id, store.StoreId)
 
 	if err != nil {
 		logger.Logging().Error(err)
 		panic(exception.NewInternalServerError(err.Error()))
 	}
 	return product
+}
+
+func (repository *ProductRepository) Delete(ctx context.Context, tx *sql.Tx, product entity.Product, store entity.Store) error {
+	SQL := "delete from products where id = ? AND store_id = ?"
+	_, err := tx.ExecContext(ctx, SQL, product.Id, store.StoreId)
+	if err != nil {
+		return err
+	} else {
+		return nil
+	}
 }

@@ -58,14 +58,29 @@ func (handler *ProductHandler) FindById(writer http.ResponseWriter, request *htt
 
 func (handler *ProductHandler) Update(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	productId := params.ByName("productId")
+	token := request.Header.Get("API-KEY")
 	productRequest := dto.ProductCreateUpdateRequest{}
 	helper.ReadFromRequestBody(request, &productRequest)
 
-	productResponse := handler.ProductService.Update(request.Context(), productRequest, productId)
+	productResponse := handler.ProductService.Update(request.Context(), productRequest, productId, token)
 	webResponse := dto.WebResponse{
 		Code:   http.StatusOK,
 		Status: "OK",
 		Data:   productResponse,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}
+
+func (handler *ProductHandler) Delete(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	productId := params.ByName("productId")
+	token := request.Header.Get("API-KEY")
+
+	productResponse := handler.ProductService.Delete(request.Context(), productId, token)
+	webResponse := dto.WebResponse{
+		Code:   http.StatusOK,
+		Status: "OK",
+		Data:   map[string]string{"message": productResponse},
 	}
 
 	helper.WriteToResponseBody(writer, webResponse)
