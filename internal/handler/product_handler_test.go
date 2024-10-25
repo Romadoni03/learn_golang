@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"context"
 	"database/sql"
+	entity "ecommerce-cloning-app/entities"
 	"ecommerce-cloning-app/internal/dto"
-	"ecommerce-cloning-app/internal/entity"
 	"ecommerce-cloning-app/internal/helper"
 	"ecommerce-cloning-app/internal/repository"
 	"ecommerce-cloning-app/internal/service"
@@ -54,8 +54,8 @@ func TestAddProductSuccess(t *testing.T) {
 	}
 	userRepository.Insert(context.Background(), tx, user)
 	tx.Commit()
-	serviceResponse := userService.Login(context.Background(), dto.UserCreateRequest{NoTelepon: user.NoTelepon, Password: "rahasia"})
-	storeService.Create(context.Background(), dto.StoreCreateRequest{Name: "Riski Store"}, serviceResponse.Token)
+	serviceResponse, _ := userService.Login(context.Background(), dto.UserCreateRequest{NoTelepon: user.NoTelepon, Password: "rahasia"})
+	storeService.Create(context.Background(), dto.StoreCreateRequest{Name: "Riski Store"}, serviceResponse.Message)
 	router := setupRouter(db)
 
 	product := dto.ProductCreateUpdateRequest{
@@ -78,7 +78,7 @@ func TestAddProductSuccess(t *testing.T) {
 
 	request := httptest.NewRequest(http.MethodPost, "http://localhost:3000/api/stores/products", requestBody)
 	request.Header.Add("Content-Type", "application/json")
-	request.Header.Add("API-KEY", serviceResponse.Token)
+	request.Header.Add("API-KEY", serviceResponse.Message)
 
 	recorder := httptest.NewRecorder()
 
@@ -128,8 +128,8 @@ func TestGetAllProductSuccess(t *testing.T) {
 	}
 	userRepository.Insert(context.Background(), tx, user)
 	tx.Commit()
-	serviceResponse := userService.Login(context.Background(), dto.UserCreateRequest{NoTelepon: user.NoTelepon, Password: "rahasia"})
-	storeService.Create(context.Background(), dto.StoreCreateRequest{Name: "Riski Store"}, serviceResponse.Token)
+	serviceResponse, _ := userService.Login(context.Background(), dto.UserCreateRequest{NoTelepon: user.NoTelepon, Password: "rahasia"})
+	storeService.Create(context.Background(), dto.StoreCreateRequest{Name: "Riski Store"}, serviceResponse.Message)
 
 	product := dto.ProductCreateUpdateRequest{
 		PhotoProduct:      "test_foto.jpg",
@@ -161,14 +161,14 @@ func TestGetAllProductSuccess(t *testing.T) {
 		PreOrder:          "yes",
 		Status:            "ready banyak",
 	}
-	productService.Create(context.Background(), product, serviceResponse.Token)
-	productService.Create(context.Background(), product2, serviceResponse.Token)
+	productService.Create(context.Background(), product, serviceResponse.Message)
+	productService.Create(context.Background(), product2, serviceResponse.Message)
 
 	router := setupRouter(db)
 
 	request := httptest.NewRequest(http.MethodGet, "http://localhost:3000/api/stores/products", nil)
 	request.Header.Add("Content-Type", "application/json")
-	request.Header.Add("API-KEY", serviceResponse.Token)
+	request.Header.Add("API-KEY", serviceResponse.Message)
 
 	recorder := httptest.NewRecorder()
 
@@ -218,8 +218,8 @@ func TestGetByIdProductSuccess(t *testing.T) {
 	}
 	userRepository.Insert(context.Background(), tx, user)
 	tx.Commit()
-	serviceResponse := userService.Login(context.Background(), dto.UserCreateRequest{NoTelepon: user.NoTelepon, Password: "rahasia"})
-	storeService.Create(context.Background(), dto.StoreCreateRequest{Name: "Riski Store"}, serviceResponse.Token)
+	serviceResponse, _ := userService.Login(context.Background(), dto.UserCreateRequest{NoTelepon: user.NoTelepon, Password: "rahasia"})
+	storeService.Create(context.Background(), dto.StoreCreateRequest{Name: "Riski Store"}, serviceResponse.Message)
 
 	product := dto.ProductCreateUpdateRequest{
 		PhotoProduct:      "test_foto.jpg",
@@ -236,13 +236,13 @@ func TestGetByIdProductSuccess(t *testing.T) {
 		PreOrder:          "no",
 		Status:            "ready",
 	}
-	productResponse := productService.Create(context.Background(), product, serviceResponse.Token)
+	productResponse := productService.Create(context.Background(), product, serviceResponse.Message)
 
 	router := setupRouter(db)
 
 	request := httptest.NewRequest(http.MethodGet, "http://localhost:3000/api/stores/products/"+productResponse.Id, nil)
 	request.Header.Add("Content-Type", "application/json")
-	request.Header.Add("API-KEY", serviceResponse.Token)
+	request.Header.Add("API-KEY", serviceResponse.Message)
 
 	recorder := httptest.NewRecorder()
 
@@ -293,8 +293,8 @@ func TestUpdateProductSuccess(t *testing.T) {
 	}
 	userRepository.Insert(context.Background(), tx, user)
 	tx.Commit()
-	serviceResponse := userService.Login(context.Background(), dto.UserCreateRequest{NoTelepon: user.NoTelepon, Password: "rahasia"})
-	storeService.Create(context.Background(), dto.StoreCreateRequest{Name: "Riski Store"}, serviceResponse.Token)
+	serviceResponse, _ := userService.Login(context.Background(), dto.UserCreateRequest{NoTelepon: user.NoTelepon, Password: "rahasia"})
+	storeService.Create(context.Background(), dto.StoreCreateRequest{Name: "Riski Store"}, serviceResponse.Message)
 
 	product := dto.ProductCreateUpdateRequest{
 		PhotoProduct:      "test_foto.jpg",
@@ -311,7 +311,7 @@ func TestUpdateProductSuccess(t *testing.T) {
 		PreOrder:          "no",
 		Status:            "ready",
 	}
-	productResponse := productService.Create(context.Background(), product, serviceResponse.Token)
+	productResponse := productService.Create(context.Background(), product, serviceResponse.Message)
 
 	router := setupRouter(db)
 
@@ -334,7 +334,7 @@ func TestUpdateProductSuccess(t *testing.T) {
 	requestBody := bytes.NewReader(data)
 	request := httptest.NewRequest(http.MethodPatch, "http://localhost:3000/api/stores/products/"+productResponse.Id, requestBody)
 	request.Header.Add("Content-Type", "application/json")
-	request.Header.Add("API-KEY", serviceResponse.Token)
+	request.Header.Add("API-KEY", serviceResponse.Message)
 
 	recorder := httptest.NewRecorder()
 
@@ -387,8 +387,8 @@ func TestDeleteProductSuccess(t *testing.T) {
 	}
 	userRepository.Insert(context.Background(), tx, user)
 	tx.Commit()
-	serviceResponse := userService.Login(context.Background(), dto.UserCreateRequest{NoTelepon: user.NoTelepon, Password: "rahasia"})
-	storeService.Create(context.Background(), dto.StoreCreateRequest{Name: "Riski Store"}, serviceResponse.Token)
+	serviceResponse, _ := userService.Login(context.Background(), dto.UserCreateRequest{NoTelepon: user.NoTelepon, Password: "rahasia"})
+	storeService.Create(context.Background(), dto.StoreCreateRequest{Name: "Riski Store"}, serviceResponse.Message)
 
 	product := dto.ProductCreateUpdateRequest{
 		PhotoProduct:      "test_foto.jpg",
@@ -405,13 +405,13 @@ func TestDeleteProductSuccess(t *testing.T) {
 		PreOrder:          "no",
 		Status:            "ready",
 	}
-	productResponse := productService.Create(context.Background(), product, serviceResponse.Token)
+	productResponse := productService.Create(context.Background(), product, serviceResponse.Message)
 
 	router := setupRouter(db)
 
 	request := httptest.NewRequest(http.MethodDelete, "http://localhost:3000/api/stores/products/"+productResponse.Id, nil)
 	request.Header.Add("Content-Type", "application/json")
-	request.Header.Add("API-KEY", serviceResponse.Token)
+	request.Header.Add("API-KEY", serviceResponse.Message)
 
 	recorder := httptest.NewRecorder()
 

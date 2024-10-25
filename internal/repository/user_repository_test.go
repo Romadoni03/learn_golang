@@ -3,7 +3,7 @@ package repository_test
 import (
 	"context"
 	"database/sql"
-	"ecommerce-cloning-app/internal/entity"
+	entity "ecommerce-cloning-app/entities"
 	"ecommerce-cloning-app/internal/helper"
 	"ecommerce-cloning-app/internal/repository"
 	"fmt"

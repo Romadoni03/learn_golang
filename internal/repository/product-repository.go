@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
-	"ecommerce-cloning-app/internal/entity"
+	entity "ecommerce-cloning-app/entities"
 	"ecommerce-cloning-app/internal/exception"
 	"ecommerce-cloning-app/internal/logger"
 	"errors"

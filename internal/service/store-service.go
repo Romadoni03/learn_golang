@@ -3,8 +3,8 @@ package service
 import (
 	"context"
 	"database/sql"
+	entity "ecommerce-cloning-app/entities"
 	"ecommerce-cloning-app/internal/dto"
-	"ecommerce-cloning-app/internal/entity"
 	"ecommerce-cloning-app/internal/exception"
 	"ecommerce-cloning-app/internal/helper"
 	"ecommerce-cloning-app/internal/logger"

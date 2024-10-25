@@ -3,8 +3,9 @@ package service
 import (
 	"context"
 	"database/sql"
+	entity "ecommerce-cloning-app/entities"
+	"ecommerce-cloning-app/internal/auth"
 	"ecommerce-cloning-app/internal/dto"
-	"ecommerce-cloning-app/internal/entity"
 	"ecommerce-cloning-app/internal/exception"
 	"ecommerce-cloning-app/internal/helper"
 	"ecommerce-cloning-app/internal/logger"
@@ -13,7 +14,6 @@ import (
 	"time"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/google/uuid"
 )
 
 type UserService struct {
@@ -68,7 +68,7 @@ func (service *UserService) Create(ctx context.Context, request dto.UserCreateRe
 
 }
 
-func (service *UserService) Login(ctx context.Context, request dto.UserCreateRequest) dto.UserLoginResponse {
+func (service *UserService) Login(ctx context.Context, request dto.UserCreateRequest) (dto.UserLoginResponse, string) {
 	logger.Logging().Info("request from phone : " + request.NoTelepon + " call Login Func In Service")
 	err := service.Validate.Struct(request)
 	if err != nil {
@@ -93,23 +93,20 @@ func (service *UserService) Login(ctx context.Context, request dto.UserCreateReq
 	}
 
 	user := entity.User{
-		Username:       data.Username,
-		NoTelepon:      data.NoTelepon,
-		Token:          uuid.NewString(),
-		TokenExpiredAt: time.Now().Local().UnixMilli() + (1000 * 60 * 60 * 24 * 7),
+		Username:  data.Username,
+		NoTelepon: data.NoTelepon,
 	}
-	errToken := service.UserRepository.UpdateToken(ctx, tx, user)
+	tokenJWT, errToken := auth.GenerateJWT(user.NoTelepon)
 	if errToken != nil {
 		logger.Logging().Error("Failed set Token")
 		panic(exception.NewUnauthorizedError("failed set token"))
 	}
 
 	return dto.UserLoginResponse{
-		NoTelepon:      user.NoTelepon,
-		Username:       user.Username,
-		Token:          user.Token,
-		TokenExpiredAt: user.TokenExpiredAt,
-	}
+		Message:   "Login Success",
+		NoTelepon: user.NoTelepon,
+		Username:  user.Username,
+	}, tokenJWT
 }
 
 func (service *UserService) Logout(ctx context.Context, request *http.Request) string {

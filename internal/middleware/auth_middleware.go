@@ -1,13 +1,13 @@
 package middleware
 
 import (
+	"context"
 	"database/sql"
+	"ecommerce-cloning-app/internal/auth"
 	"ecommerce-cloning-app/internal/exception"
-	"ecommerce-cloning-app/internal/helper"
 	"ecommerce-cloning-app/internal/logger"
 	"ecommerce-cloning-app/internal/repository"
 	"net/http"
-	"time"
 
 	"github.com/julienschmidt/httprouter"
 )
@@ -20,21 +20,23 @@ type AuthMiddleware struct {
 func (middleware *AuthMiddleware) AuthMiddleware(handler httprouter.Handle) httprouter.Handle {
 	return func(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 		logger.LogHandler(request).Info("Incoming Request")
-		token := request.Header.Get("API-KEY")
-		if token == "" {
-			logger.LogHandler(request).Error("UNAUTHORIZED")
-			panic(exception.NewUnauthorizedError("UNAUTHORIZED"))
-		}
-		tx, err := middleware.DB.Begin()
-		helper.IfPanicError(err)
-		defer tx.Commit()
-		user, _ := middleware.UserRepository.FindFirstByToken(request.Context(), tx, token)
-
-		if user.Token != token && user.TokenExpiredAt < time.Now().UnixMilli() {
+		cookie, errCookie := request.Cookie("token")
+		if errCookie != nil {
 			logger.LogHandler(request).Error("UNAUTHORIZED")
 			panic(exception.NewUnauthorizedError("UNAUTHORIZED"))
 		}
 
+		tokenString := cookie.Value
+		claims, errValidate := auth.ValidateJWT(tokenString)
+		logger.Logging().Info("Phone :", claims.Phone)
+		logger.Logging().Info("Access Token :", tokenString)
+		logger.Logging().Info("ExpiredAt :", claims.ExpiresAt.Time)
+		if errValidate != nil {
+			logger.LogHandler(request).Error("UNAUTHORIZED")
+			panic(exception.NewUnauthorizedError("UNAUTHORIZED"))
+		}
+
+		request = request.WithContext(context.WithValue(request.Context(), "phone", claims.Phone))
 		handler(writer, request, params)
 	}
 }

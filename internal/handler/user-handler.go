@@ -37,14 +37,19 @@ func (handler *UserHandler) Login(writer http.ResponseWriter, request *http.Requ
 	loginRequest := dto.UserCreateRequest{}
 	helper.ReadFromRequestBody(request, &loginRequest)
 
-	userResponse := handler.UserService.Login(request.Context(), loginRequest)
+	userResponse, token := handler.UserService.Login(request.Context(), loginRequest)
 	logger.LogHandler(request).Info(userResponse)
 	webResponse := dto.WebResponse{
 		Code:   http.StatusOK,
 		Status: "OK",
 		Data:   userResponse,
 	}
-
+	http.SetCookie(writer, &http.Cookie{
+		Name:     "access_token",
+		Value:    token,
+		HttpOnly: true,
+		Secure:   true,
+	})
 	helper.WriteToResponseBody(writer, webResponse)
 }
 

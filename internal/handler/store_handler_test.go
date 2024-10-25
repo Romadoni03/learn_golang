@@ -3,8 +3,8 @@ package handler_test
 import (
 	"context"
 	"database/sql"
+	entity "ecommerce-cloning-app/entities"
 	"ecommerce-cloning-app/internal/dto"
-	"ecommerce-cloning-app/internal/entity"
 	"ecommerce-cloning-app/internal/helper"
 	"ecommerce-cloning-app/internal/repository"
 	"ecommerce-cloning-app/internal/service"
@@ -50,13 +50,13 @@ func TestCreateStoreSuccess(t *testing.T) {
 	}
 	repository.Insert(context.Background(), tx, user)
 	tx.Commit()
-	serviceResponse := service.Login(context.Background(), dto.UserCreateRequest{NoTelepon: user.NoTelepon, Password: "rahasia"})
+	serviceResponse, _ := service.Login(context.Background(), dto.UserCreateRequest{NoTelepon: user.NoTelepon, Password: "rahasia"})
 	router := setupRouter(db)
 
 	requestBody := strings.NewReader(`{"name" : "riski store"}`)
 	request := httptest.NewRequest(http.MethodPost, "http://localhost:3000/api/stores", requestBody)
 	request.Header.Add("Content-Type", "application/json")
-	request.Header.Add("API-KEY", serviceResponse.Token)
+	request.Header.Add("API-KEY", serviceResponse.Message)
 
 	recorder := httptest.NewRecorder()
 
@@ -100,13 +100,13 @@ func TestDeleteStoreSuccess(t *testing.T) {
 	}
 	userRepository.Insert(context.Background(), tx, user)
 	tx.Commit()
-	serviceResponse := userService.Login(context.Background(), dto.UserCreateRequest{NoTelepon: user.NoTelepon, Password: "rahasia"})
-	storeService.Create(context.Background(), dto.StoreCreateRequest{Name: "riski_taka_store"}, serviceResponse.Token)
+	serviceResponse, _ := userService.Login(context.Background(), dto.UserCreateRequest{NoTelepon: user.NoTelepon, Password: "rahasia"})
+	storeService.Create(context.Background(), dto.StoreCreateRequest{Name: "riski_taka_store"}, serviceResponse.Message)
 	router := setupRouter(db)
 
 	request := httptest.NewRequest(http.MethodDelete, "http://localhost:3000/api/stores", nil)
 	request.Header.Add("Content-Type", "application/json")
-	request.Header.Add("API-KEY", serviceResponse.Token)
+	request.Header.Add("API-KEY", serviceResponse.Message)
 
 	recorder := httptest.NewRecorder()
 
@@ -152,13 +152,13 @@ func TestFindByUser(t *testing.T) {
 	}
 	userRepository.Insert(context.Background(), tx, user)
 	tx.Commit()
-	serviceResponse := userService.Login(context.Background(), dto.UserCreateRequest{NoTelepon: user.NoTelepon, Password: "rahasia"})
-	storeService.Create(context.Background(), dto.StoreCreateRequest{Name: "riski_taka_store"}, serviceResponse.Token)
+	serviceResponse, _ := userService.Login(context.Background(), dto.UserCreateRequest{NoTelepon: user.NoTelepon, Password: "rahasia"})
+	storeService.Create(context.Background(), dto.StoreCreateRequest{Name: "riski_taka_store"}, serviceResponse.Message)
 	router := setupRouter(db)
 
 	request := httptest.NewRequest(http.MethodGet, "http://localhost:3000/api/stores", nil)
 	request.Header.Add("Content-Type", "application/json")
-	request.Header.Add("API-KEY", serviceResponse.Token)
+	request.Header.Add("API-KEY", serviceResponse.Message)
 
 	recorder := httptest.NewRecorder()
 
