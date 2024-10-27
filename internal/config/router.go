@@ -14,7 +14,7 @@ func NewRouter(userHandler *handler.UserHandler, storeHandler *handler.StoreHand
 	router.POST("/api/users", userHandler.Create)
 	router.POST("/api/users/login", userHandler.Login)
 	router.DELETE("/api/users/logout", middleware.AuthMiddleware(userHandler.Logout))
-	router.GET("/api/users/profile", middleware.AuthMiddleware(userHandler.GetByToken))
+	router.GET("/api/users/profile", middleware.AuthMiddleware(userHandler.FindUser))
 	router.PATCH("/api/users/profile", middleware.AuthMiddleware(userHandler.Update))
 	router.POST("/api/stores", middleware.AuthMiddleware(storeHandler.Create))
 	router.DELETE("/api/stores", middleware.AuthMiddleware(storeHandler.Delete))

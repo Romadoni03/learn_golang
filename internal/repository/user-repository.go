@@ -13,7 +13,7 @@ type UserRepository struct {
 }
 
 func (repository *UserRepository) Insert(ctx context.Context, tx *sql.Tx, user entity.User) error {
-	SQL := "insert into users( no_telepon, password, username, last_updated_username, name, email, photo_profile, bio, gender, status_member, birth_date, created_at, token, token_expired_at) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+	SQL := "insert into users( no_telepon, password, username, last_updated_username, name, email, photo_profile, bio, gender, status_member, birth_date, created_at, token) values (?,?,?,?,?,?,?,?,?,?,?,?,?)"
 
 	_, err := tx.ExecContext(
 		ctx,
@@ -29,8 +29,7 @@ func (repository *UserRepository) Insert(ctx context.Context, tx *sql.Tx, user e
 		user.StatusMember,
 		user.BirthDate,
 		user.CreatedAt,
-		user.Token,
-		user.TokenExpiredAt)
+		user.Token)
 
 	if err != nil {
 		logger.Logging().Error(err)
@@ -84,7 +83,7 @@ func (repository *UserRepository) FindFirstByToken(ctx context.Context, tx *sql.
 }
 
 func (repository *UserRepository) DeleteToken(ctx context.Context, tx *sql.Tx, token string) error {
-	SQL := "update users set token = '', token_expired_at = 0 where token = ?"
+	SQL := "update users set token = '', token_expired_at = '' where token = ?"
 	_, err := tx.ExecContext(ctx, SQL, token)
 	if err != nil {
 		return err
@@ -118,4 +117,22 @@ func (repository *UserRepository) Update(ctx context.Context, tx *sql.Tx, user e
 		return err
 	}
 	return nil
+}
+
+func (repository *UserRepository) FindUser(ctx context.Context, tx *sql.Tx, phone string) (entity.User, error) {
+	SQL := "select username, last_updated_username, users.name, email, users.no_telepon, photo_profile, stores.name, gender, birth_date from users LEFT JOIN stores ON users.no_telepon = stores.no_telepon where users.no_telepon = ?"
+	rows, err := tx.QueryContext(ctx, SQL, phone)
+	helper.IfPanicError(err)
+	defer rows.Close()
+
+	user := entity.User{}
+	// store := entity.Store{}
+	if rows.Next() {
+		errNext := rows.Scan(&user.Username, &user.LastUpdatedUsername, &user.Name, &user.Email, &user.NoTelepon, &user.PhotoProfile, &user.Store.Name, &user.Gender, &user.BirthDate)
+		helper.IfPanicError(errNext)
+		// user.Store = store
+		return user, nil
+	} else {
+		return user, errors.New("user not found")
+	}
 }

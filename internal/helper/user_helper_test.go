@@ -61,7 +61,15 @@ func TestExpiredAt(t *testing.T) {
 
 func TestGetImage(t *testing.T) {
 	// Panggil fungsi GetImage
-	img := helper.GetImage("account_profile.png")
+
+	type userHelper struct {
+		photo string
+	}
+
+	user := userHelper{
+		photo: "account_profile.png",
+	}
+	img := helper.GetImage(user.photo)
 
 	fmt.Println(img)
 }

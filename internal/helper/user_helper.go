@@ -2,6 +2,7 @@ package helper
 
 import (
 	"encoding/base64"
+	"fmt"
 	"io"
 	"math/rand"
 	"os"
@@ -60,7 +61,8 @@ func GeneratedTimeNow() time.Time {
 
 func GetImage(image string) string {
 	// imageDcd := DecodeImageName(image)
-	fileImg, err := os.Open(`D:\dev\portofolio\ecommerce-cloning-app\assets\images\photo_profile\` + image)
+	imagePath := fmt.Sprintf("D:/dev/portofolio/ecommerce-cloning-app/assets/images/photo_profile/%s", image)
+	fileImg, err := os.Open(imagePath)
 	IfPanicError(err)
 	defer fileImg.Close()
 

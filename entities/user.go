@@ -16,6 +16,6 @@ type User struct {
 	BirthDate           string
 	CreatedAt           time.Time
 	Token               string
-	TokenExpiredAt      int64
+	TokenExpiredAt      time.Time
 	Store               Store
 }

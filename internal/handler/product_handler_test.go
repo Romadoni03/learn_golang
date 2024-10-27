@@ -50,7 +50,6 @@ func TestAddProductSuccess(t *testing.T) {
 		BirthDate:           "",
 		CreatedAt:           helper.GeneratedTimeNow(),
 		Token:               "",
-		TokenExpiredAt:      0,
 	}
 	userRepository.Insert(context.Background(), tx, user)
 	tx.Commit()
@@ -124,7 +123,6 @@ func TestGetAllProductSuccess(t *testing.T) {
 		BirthDate:           "",
 		CreatedAt:           helper.GeneratedTimeNow(),
 		Token:               "",
-		TokenExpiredAt:      0,
 	}
 	userRepository.Insert(context.Background(), tx, user)
 	tx.Commit()
@@ -214,7 +212,6 @@ func TestGetByIdProductSuccess(t *testing.T) {
 		BirthDate:           "",
 		CreatedAt:           helper.GeneratedTimeNow(),
 		Token:               "",
-		TokenExpiredAt:      0,
 	}
 	userRepository.Insert(context.Background(), tx, user)
 	tx.Commit()
@@ -289,7 +286,6 @@ func TestUpdateProductSuccess(t *testing.T) {
 		BirthDate:           "",
 		CreatedAt:           helper.GeneratedTimeNow(),
 		Token:               "",
-		TokenExpiredAt:      0,
 	}
 	userRepository.Insert(context.Background(), tx, user)
 	tx.Commit()
@@ -383,7 +379,6 @@ func TestDeleteProductSuccess(t *testing.T) {
 		BirthDate:           "",
 		CreatedAt:           helper.GeneratedTimeNow(),
 		Token:               "",
-		TokenExpiredAt:      0,
 	}
 	userRepository.Insert(context.Background(), tx, user)
 	tx.Commit()

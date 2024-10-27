@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 )
 
 var jwtKey = []byte(os.Getenv("JWT_KEY"))
@@ -31,6 +32,10 @@ func GenerateJWT(phone string) (string, error) {
 	} else {
 		return tokenString, nil
 	}
+}
+
+func GenerateRefreshToken() string {
+	return uuid.NewString()
 }
 
 func ValidateJWT(tokenString string) (*claims, error) {

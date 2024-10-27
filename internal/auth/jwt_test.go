@@ -33,3 +33,11 @@ func TestValidateJWT(t *testing.T) {
 
 	fmt.Println(claims)
 }
+
+func TestRefreshToken(t *testing.T) {
+	for i := 0; i < 10; i++ {
+		refresh := auth.GenerateRefreshToken()
+		fmt.Println(refresh)
+	}
+
+}

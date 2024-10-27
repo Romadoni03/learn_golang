@@ -46,7 +46,6 @@ func TestCreateStoreSuccess(t *testing.T) {
 		BirthDate:           "",
 		CreatedAt:           helper.GeneratedTimeNow(),
 		Token:               "",
-		TokenExpiredAt:      0,
 	}
 	repository.Insert(context.Background(), tx, user)
 	tx.Commit()
@@ -96,7 +95,6 @@ func TestDeleteStoreSuccess(t *testing.T) {
 		BirthDate:           "",
 		CreatedAt:           helper.GeneratedTimeNow(),
 		Token:               "",
-		TokenExpiredAt:      0,
 	}
 	userRepository.Insert(context.Background(), tx, user)
 	tx.Commit()
@@ -148,7 +146,6 @@ func TestFindByUser(t *testing.T) {
 		BirthDate:           "",
 		CreatedAt:           helper.GeneratedTimeNow(),
 		Token:               "",
-		TokenExpiredAt:      0,
 	}
 	userRepository.Insert(context.Background(), tx, user)
 	tx.Commit()

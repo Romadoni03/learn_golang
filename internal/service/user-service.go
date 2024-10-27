@@ -55,7 +55,6 @@ func (service *UserService) Create(ctx context.Context, request dto.UserCreateRe
 		BirthDate:           "",
 		CreatedAt:           helper.GeneratedTimeNow(),
 		Token:               "",
-		TokenExpiredAt:      0,
 	}
 
 	errService := service.UserRepository.Insert(ctx, tx, user)
@@ -68,7 +67,7 @@ func (service *UserService) Create(ctx context.Context, request dto.UserCreateRe
 
 }
 
-func (service *UserService) Login(ctx context.Context, request dto.UserCreateRequest) (dto.UserLoginResponse, string) {
+func (service *UserService) Login(ctx context.Context, request dto.UserCreateRequest) (dto.UserLoginResponse, auth.TokenJWT) {
 	logger.Logging().Info("request from phone : " + request.NoTelepon + " call Login Func In Service")
 	err := service.Validate.Struct(request)
 	if err != nil {
@@ -93,8 +92,10 @@ func (service *UserService) Login(ctx context.Context, request dto.UserCreateReq
 	}
 
 	user := entity.User{
-		Username:  data.Username,
-		NoTelepon: data.NoTelepon,
+		Username:       data.Username,
+		NoTelepon:      data.NoTelepon,
+		Token:          auth.GenerateRefreshToken(),
+		TokenExpiredAt: time.Now().Local().Add(time.Hour * 24),
 	}
 	tokenJWT, errToken := auth.GenerateJWT(user.NoTelepon)
 	if errToken != nil {
@@ -102,20 +103,33 @@ func (service *UserService) Login(ctx context.Context, request dto.UserCreateReq
 		panic(exception.NewUnauthorizedError("failed set token"))
 	}
 
-	return dto.UserLoginResponse{
+	errUpdateToken := service.UserRepository.UpdateToken(ctx, tx, user)
+	if errUpdateToken != nil {
+		logger.Logging().Error("Failed set Token")
+		panic(exception.NewUnauthorizedError("failed set token"))
+	}
+
+	userResponse := dto.UserLoginResponse{
 		Message:   "Login Success",
 		NoTelepon: user.NoTelepon,
 		Username:  user.Username,
-	}, tokenJWT
+	}
+
+	jwt := auth.TokenJWT{
+		AccessToken:  tokenJWT,
+		RefreshToken: user.Token,
+	}
+
+	return userResponse, jwt
 }
 
 func (service *UserService) Logout(ctx context.Context, request *http.Request) string {
-	token := request.Header.Get("API-KEY")
+	refreshToken := request.Cookies()
 	tx, err := service.DB.Begin()
 	helper.IfPanicError(err)
 	defer helper.CommitOrRollback(tx)
 
-	errLogout := service.UserRepository.DeleteToken(ctx, tx, token)
+	errLogout := service.UserRepository.DeleteToken(ctx, tx, refreshToken[1].Value)
 	if errLogout != nil {
 		logger.Logging().Error("Err : " + errLogout.Error() + "failed to logout")
 		panic(exception.NewUnauthorizedError("failed to logout"))
@@ -123,8 +137,8 @@ func (service *UserService) Logout(ctx context.Context, request *http.Request) s
 	return "success logout"
 }
 
-func (service *UserService) GetByToken(ctx context.Context, request *http.Request) dto.UserProfileResponse {
-	token := request.Header.Get("API-KEY")
+func (service *UserService) FindUser(ctx context.Context, request *http.Request) dto.UserProfileResponse {
+	phone := ctx.Value("phone").(string)
 	tx, err := service.DB.Begin()
 	helper.IfPanicError(err)
 	defer helper.CommitOrRollback(tx)
@@ -132,7 +146,7 @@ func (service *UserService) GetByToken(ctx context.Context, request *http.Reques
 	var nameStore string
 	// var userProfile string
 
-	user, err := service.UserRepository.GetByToken(ctx, tx, token)
+	user, err := service.UserRepository.FindUser(ctx, tx, phone)
 	if err != nil {
 		logger.Logging().Error("Err : " + err.Error() + "user not found")
 		panic(exception.NewNotFoundError("user not found"))

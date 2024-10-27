@@ -47,7 +47,6 @@ func TestInsert(t *testing.T) {
 		BirthDate:           "",
 		CreatedAt:           helper.GeneratedTimeNow(),
 		Token:               "",
-		TokenExpiredAt:      0,
 	}
 
 	repository := repository.UserRepository{}

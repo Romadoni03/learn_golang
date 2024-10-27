@@ -132,7 +132,6 @@ func TestLoginSuccess(t *testing.T) {
 		BirthDate:           "",
 		CreatedAt:           helper.GeneratedTimeNow(),
 		Token:               "",
-		TokenExpiredAt:      0,
 	}
 	repository.Insert(context.Background(), tx, user)
 	tx.Commit()
@@ -151,7 +150,8 @@ func TestLoginSuccess(t *testing.T) {
 	assert.Equal(t, 200, response.StatusCode)
 
 	cookie := response.Cookies()
-	fmt.Println(cookie)
+	fmt.Println(cookie[0])
+	fmt.Println(cookie[1])
 
 	// body, _ := io.ReadAll(response.Body)
 	// var responseBody map[string]any
@@ -183,7 +183,6 @@ func TestLoginFailed(t *testing.T) {
 		BirthDate:           "",
 		CreatedAt:           helper.GeneratedTimeNow(),
 		Token:               "",
-		TokenExpiredAt:      0,
 	}
 	repository.Insert(context.Background(), tx, user)
 	tx.Commit()
@@ -232,17 +231,27 @@ func TestLogoutSuccess(t *testing.T) {
 		BirthDate:           "",
 		CreatedAt:           helper.GeneratedTimeNow(),
 		Token:               "",
-		TokenExpiredAt:      0,
 	}
 	repository.Insert(context.Background(), tx, user)
 	tx.Commit()
-	serviceResponse, _ := service.Login(context.Background(), dto.UserCreateRequest{NoTelepon: user.NoTelepon, Password: "rahasia"})
+	_, token := service.Login(context.Background(), dto.UserCreateRequest{NoTelepon: user.NoTelepon, Password: "rahasia"})
 
 	router := setupRouter(db)
 
 	request := httptest.NewRequest(http.MethodDelete, "http://localhost:3000/api/users/logout", nil)
 	request.Header.Add("Content-Type", "application/json")
-	request.Header.Add("API-KEY", serviceResponse.Message)
+	request.AddCookie(&http.Cookie{
+		Name:     "access_token",
+		Value:    token.AccessToken,
+		HttpOnly: true,
+		Secure:   true,
+	})
+	request.AddCookie(&http.Cookie{
+		Name:     "access_token",
+		Value:    token.RefreshToken,
+		HttpOnly: true,
+		Secure:   true,
+	})
 
 	recorder := httptest.NewRecorder()
 
@@ -258,17 +267,18 @@ func TestLogoutSuccess(t *testing.T) {
 	assert.Equal(t, "OK", responseBody["status"])
 
 	fmt.Println(response.StatusCode)
-	fmt.Println(request.Header.Get("API-KEY"))
+	// cookie := response.Cookies()
+	// fmt.Println(cookie[0])
 
 }
 
-func TestGetByToken(t *testing.T) {
+func TestFindUser(t *testing.T) {
 	db := setUpDB()
 	truncateUser(db)
 	tx, _ := db.Begin()
 	repository := repository.UserRepository{}
-	// validate := validator.New()
-	// servic:= service.UserService{DB: db, UserRepository: &repository, Validate: validate}
+	validate := validator.New()
+	service := service.UserService{DB: db, UserRepository: &repository, Validate: validate}
 	user := entity.User{
 		NoTelepon:           "083156490686",
 		Password:            helper.HashingPassword("rahasia"),
@@ -283,17 +293,27 @@ func TestGetByToken(t *testing.T) {
 		BirthDate:           "",
 		CreatedAt:           helper.GeneratedTimeNow(),
 		Token:               "",
-		TokenExpiredAt:      0,
 	}
 	repository.Insert(context.Background(), tx, user)
 	tx.Commit()
-	// serviceResponse := service.Login(context.Background(), dto.UserCreateRequest{NoTelepon: user.NoTelepon, Password: "rahasia"})
+	_, token := service.Login(context.Background(), dto.UserCreateRequest{NoTelepon: user.NoTelepon, Password: "rahasia"})
 
 	router := setupRouter(db)
 
 	request := httptest.NewRequest(http.MethodGet, "http://localhost:3000/api/users/profile", nil)
 	request.Header.Add("Content-Type", "application/json")
-	// request.Header.Add("API-KEY", serviceResponse.Message)
+	request.AddCookie(&http.Cookie{
+		Name:     "access_token",
+		Value:    token.AccessToken,
+		HttpOnly: true,
+		Secure:   true,
+	})
+	request.AddCookie(&http.Cookie{
+		Name:     "access_token",
+		Value:    token.RefreshToken,
+		HttpOnly: true,
+		Secure:   true,
+	})
 
 	recorder := httptest.NewRecorder()
 
@@ -333,7 +353,6 @@ func TestUpdateprofileFailed(t *testing.T) {
 		BirthDate:           "",
 		CreatedAt:           helper.GeneratedTimeNow(),
 		Token:               "",
-		TokenExpiredAt:      0,
 	}
 	repository.Insert(context.Background(), tx, user)
 	tx.Commit()

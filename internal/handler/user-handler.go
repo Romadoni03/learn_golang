@@ -6,6 +6,7 @@ import (
 	"ecommerce-cloning-app/internal/logger"
 	"ecommerce-cloning-app/internal/service"
 	"net/http"
+	"time"
 
 	"github.com/julienschmidt/httprouter"
 )
@@ -37,7 +38,7 @@ func (handler *UserHandler) Login(writer http.ResponseWriter, request *http.Requ
 	loginRequest := dto.UserCreateRequest{}
 	helper.ReadFromRequestBody(request, &loginRequest)
 
-	userResponse, token := handler.UserService.Login(request.Context(), loginRequest)
+	userResponse, jwt := handler.UserService.Login(request.Context(), loginRequest)
 	logger.LogHandler(request).Info(userResponse)
 	webResponse := dto.WebResponse{
 		Code:   http.StatusOK,
@@ -46,10 +47,18 @@ func (handler *UserHandler) Login(writer http.ResponseWriter, request *http.Requ
 	}
 	http.SetCookie(writer, &http.Cookie{
 		Name:     "access_token",
-		Value:    token,
+		Value:    jwt.AccessToken,
 		HttpOnly: true,
 		Secure:   true,
 	})
+
+	http.SetCookie(writer, &http.Cookie{
+		Name:     "refresh_token",
+		Value:    jwt.RefreshToken,
+		HttpOnly: true,
+		Secure:   true,
+	})
+
 	helper.WriteToResponseBody(writer, webResponse)
 }
 
@@ -61,11 +70,27 @@ func (handler *UserHandler) Logout(writer http.ResponseWriter, request *http.Req
 		Data:   map[string]string{"message": message},
 	}
 
+	http.SetCookie(writer, &http.Cookie{
+		Name:     "access_token",
+		Value:    "",
+		Expires:  time.Unix(0, 0),
+		HttpOnly: true,
+		Secure:   true,
+	})
+
+	http.SetCookie(writer, &http.Cookie{
+		Name:     "refresh_token",
+		Value:    "",
+		Expires:  time.Unix(0, 0),
+		HttpOnly: true,
+		Secure:   true,
+	})
+
 	helper.WriteToResponseBody(writer, webResponse)
 }
 
-func (handler *UserHandler) GetByToken(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	userResponse := handler.UserService.GetByToken(request.Context(), request)
+func (handler *UserHandler) FindUser(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	userResponse := handler.UserService.FindUser(request.Context(), request)
 	webResponse := dto.WebResponse{
 		Code:   http.StatusOK,
 		Status: "OK",
@@ -76,10 +101,11 @@ func (handler *UserHandler) GetByToken(writer http.ResponseWriter, request *http
 }
 
 func (handler *UserHandler) Update(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	token := request.Cookies()[1].Value
 	userUpdateRequest := dto.UserUpdateRequest{}
 	helper.ReadFromRequestBody(request, &userUpdateRequest)
 
-	userResponse := handler.UserService.Update(request.Context(), userUpdateRequest, request.Header.Get("API-KEY"))
+	userResponse := handler.UserService.Update(request.Context(), userUpdateRequest, token)
 	webResponse := dto.WebResponse{
 		Code:   http.StatusOK,
 		Status: "OK",

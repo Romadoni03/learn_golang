@@ -20,7 +20,7 @@ type AuthMiddleware struct {
 func (middleware *AuthMiddleware) AuthMiddleware(handler httprouter.Handle) httprouter.Handle {
 	return func(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 		logger.LogHandler(request).Info("Incoming Request")
-		cookie, errCookie := request.Cookie("token")
+		cookie, errCookie := request.Cookie("access_token")
 		if errCookie != nil {
 			logger.LogHandler(request).Error("UNAUTHORIZED")
 			panic(exception.NewUnauthorizedError("UNAUTHORIZED"))
