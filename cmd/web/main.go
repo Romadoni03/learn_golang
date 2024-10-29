@@ -12,9 +12,11 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	godotenv.Load("../../.env")
 	db, _ := config.NewDB()
 	validate := validator.New()
 	//user
