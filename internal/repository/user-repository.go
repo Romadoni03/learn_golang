@@ -41,14 +41,14 @@ func (repository *UserRepository) Insert(ctx context.Context, tx *sql.Tx, user e
 }
 
 func (repository *UserRepository) FindByPhone(ctx context.Context, tx *sql.Tx, userPhone string) (entity.User, error) {
-	SQL := "select no_telepon, password, username from users where no_telepon = ?"
+	SQL := "select no_telepon, password, username, token from users where no_telepon = ?"
 	rows, err := tx.QueryContext(ctx, SQL, userPhone)
 	helper.PanicIfError(err)
 	defer rows.Close()
 
 	user := entity.User{}
 	if rows.Next() {
-		err := rows.Scan(&user.NoTelepon, &user.Password, &user.Username)
+		err := rows.Scan(&user.NoTelepon, &user.Password, &user.Username, &user.Token)
 		helper.PanicIfError(err)
 		return user, nil
 	} else {

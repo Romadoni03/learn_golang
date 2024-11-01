@@ -67,7 +67,7 @@ func (service *UserService) Create(ctx context.Context, request dto.UserCreateRe
 
 }
 
-func (service *UserService) Login(ctx context.Context, request dto.UserCreateRequest) (dto.UserLoginResponse, auth.TokenJWT) {
+func (service *UserService) Login(ctx context.Context, request dto.UserCreateRequest) (dto.UserLoginResponse, string) {
 	logger.Logging().Info("request from phone : " + request.NoTelepon + " call Login Func In Service")
 	err := service.Validate.Struct(request)
 	if err != nil {
@@ -83,6 +83,11 @@ func (service *UserService) Login(ctx context.Context, request dto.UserCreateReq
 	if errCheck != nil {
 		logger.Logging().Error("username or password is wrong")
 		panic(exception.NewUnauthorizedError("username or password is wrong"))
+	}
+
+	if data.Token != "" {
+		logger.Logging().Error(data.NoTelepon + " already login")
+		panic(exception.NewUnauthorizedError(data.NoTelepon + " already login"))
 	}
 
 	errCheckPw := helper.CompiringPassword(data.Password, request.Password)
@@ -109,18 +114,12 @@ func (service *UserService) Login(ctx context.Context, request dto.UserCreateReq
 		panic(exception.NewUnauthorizedError("failed set token"))
 	}
 
-	userResponse := dto.UserLoginResponse{
-		Message:   "Login Success",
-		NoTelepon: user.NoTelepon,
-		Username:  user.Username,
-	}
-
-	jwt := auth.TokenJWT{
-		AccessToken:  tokenJWT,
-		RefreshToken: user.Token,
-	}
-
-	return userResponse, jwt
+	return dto.UserLoginResponse{
+		Message:     "Login Success",
+		NoTelepon:   user.NoTelepon,
+		Username:    user.Username,
+		AccessToken: tokenJWT,
+	}, user.Token
 }
 
 func (service *UserService) Logout(ctx context.Context, request *http.Request) string {

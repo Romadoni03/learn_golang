@@ -38,23 +38,19 @@ func (handler *UserHandler) Login(writer http.ResponseWriter, request *http.Requ
 	loginRequest := dto.UserCreateRequest{}
 	helper.ReadFromRequestBody(request, &loginRequest)
 
-	userResponse, jwt := handler.UserService.Login(request.Context(), loginRequest)
+	userResponse, refreshToken := handler.UserService.Login(request.Context(), loginRequest)
 	logger.LogHandler(request).Info(userResponse)
+	logger.Logging().Info("access_token :" + userResponse.AccessToken)
+	logger.Logging().Info("refresh_token :" + refreshToken)
 	webResponse := dto.WebResponse{
 		Code:   http.StatusOK,
 		Status: "OK",
 		Data:   userResponse,
 	}
-	http.SetCookie(writer, &http.Cookie{
-		Name:     "access_token",
-		Value:    jwt.AccessToken,
-		HttpOnly: true,
-		Secure:   true,
-	})
 
 	http.SetCookie(writer, &http.Cookie{
 		Name:     "refresh_token",
-		Value:    jwt.RefreshToken,
+		Value:    refreshToken,
 		HttpOnly: true,
 		Secure:   true,
 	})

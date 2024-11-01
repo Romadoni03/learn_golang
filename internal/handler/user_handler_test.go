@@ -16,20 +16,28 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/go-playground/validator/v10"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/joho/godotenv"
 	"github.com/julienschmidt/httprouter"
 	"github.com/magiconair/properties/assert"
 	"github.com/sirupsen/logrus"
 )
 
 func setUpDB() *sql.DB {
-	db, err := sql.Open("mysql", "root@tcp(localhost:3306)/portofolio_golang?parseTime=true")
-	helper.IfPanicError(err)
+	godotenv.Load("../../.env")
+	dbUser := os.Getenv("DB_USER")
+	dbHost := os.Getenv("DB_HOST")
+	dbPort := os.Getenv("DB_PORT")
+	dbName := os.Getenv("DB_NAME")
+	dataSource := fmt.Sprintf("%s@tcp(%s:%s)/%s?parseTime=true", dbUser, dbHost, dbPort, dbName)
+	db, err := sql.Open("mysql", dataSource)
+	helper.PanicIfError(err)
 
 	db.SetMaxIdleConns(5)
 	db.SetMaxOpenConns(20)
@@ -234,21 +242,16 @@ func TestLogoutSuccess(t *testing.T) {
 	}
 	repository.Insert(context.Background(), tx, user)
 	tx.Commit()
-	_, token := service.Login(context.Background(), dto.UserCreateRequest{NoTelepon: user.NoTelepon, Password: "rahasia"})
+	userLogin, token := service.Login(context.Background(), dto.UserCreateRequest{NoTelepon: user.NoTelepon, Password: "rahasia"})
 
 	router := setupRouter(db)
 
 	request := httptest.NewRequest(http.MethodDelete, "http://localhost:3000/api/users/logout", nil)
 	request.Header.Add("Content-Type", "application/json")
+	request.Header.Add("token", userLogin.AccessToken)
 	request.AddCookie(&http.Cookie{
-		Name:     "access_token",
-		Value:    token.AccessToken,
-		HttpOnly: true,
-		Secure:   true,
-	})
-	request.AddCookie(&http.Cookie{
-		Name:     "access_token",
-		Value:    token.RefreshToken,
+		Name:     "refresh_token",
+		Value:    token,
 		HttpOnly: true,
 		Secure:   true,
 	})
@@ -303,14 +306,8 @@ func TestFindUser(t *testing.T) {
 	request := httptest.NewRequest(http.MethodGet, "http://localhost:3000/api/users/profile", nil)
 	request.Header.Add("Content-Type", "application/json")
 	request.AddCookie(&http.Cookie{
-		Name:     "access_token",
-		Value:    token.AccessToken,
-		HttpOnly: true,
-		Secure:   true,
-	})
-	request.AddCookie(&http.Cookie{
-		Name:     "access_token",
-		Value:    token.RefreshToken,
+		Name:     "refresh_token",
+		Value:    token,
 		HttpOnly: true,
 		Secure:   true,
 	})

@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"ecommerce-cloning-app/internal/exception"
 	"ecommerce-cloning-app/internal/logger"
 	"os"
 	"time"
@@ -45,12 +46,13 @@ func ValidateJWT(tokenString string) (*claims, error) {
 	})
 
 	if err != nil || !token.Valid {
-		return nil, err
+		logger.Logging().Error(err)
+		panic(exception.NewUnauthorizedError(err.Error()))
 	}
 
 	if time.Now().Local().After(claims.ExpiresAt.Time) {
 		logger.Logging().Error("token has expired")
-		return nil, err
+		panic(exception.NewUnauthorizedError("token has expired"))
 	}
 
 	return claims, nil

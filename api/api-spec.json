@@ -7,7 +7,7 @@
     },
     "servers": [
         {
-            "url": "http://localhost:8008/api"
+            "url": "http://localhost:3000/api"
         }
     ],
     "paths": {
@@ -88,6 +88,14 @@
                 "responses": {
                     "200": {
                         "description": "Success login",
+                        "headers": {
+                            "Set-Cookie":{
+                                "schema": {
+                                    "type": "string",
+                                    "example": "access_token=abc123; refersh_token=abcd123; httpOnly"
+                                }
+                            }
+                        },
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -929,8 +937,8 @@
         "securitySchemes": {
             "UserAuth": {
                 "type": "apiKey",
-                "in": "header",
-                "name": "X-API-KEY",
+                "in": "cookie",
+                "name": "access_token",
                 "description": "Authentication for user"
             }
         },

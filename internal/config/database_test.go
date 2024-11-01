@@ -1,14 +1,15 @@
 package config_test
 
 import (
-	"database/sql"
+	"ecommerce-cloning-app/internal/config"
 	"testing"
 
 	_ "github.com/go-sql-driver/mysql"
 )
 
 func TestOpenConnection(t *testing.T) {
-	db, err := sql.Open("mysql", "root@tcp(localhost:3306)/portofolio_golang")
+
+	db, err := config.NewDB()
 	if err != nil {
 		panic(err)
 	}
