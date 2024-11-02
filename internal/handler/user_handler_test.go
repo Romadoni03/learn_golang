@@ -299,12 +299,13 @@ func TestFindUser(t *testing.T) {
 	}
 	repository.Insert(context.Background(), tx, user)
 	tx.Commit()
-	_, token := service.Login(context.Background(), dto.UserCreateRequest{NoTelepon: user.NoTelepon, Password: "rahasia"})
+	responseLogin, token := service.Login(context.Background(), dto.UserCreateRequest{NoTelepon: user.NoTelepon, Password: "rahasia"})
 
 	router := setupRouter(db)
 
 	request := httptest.NewRequest(http.MethodGet, "http://localhost:3000/api/users/profile", nil)
 	request.Header.Add("Content-Type", "application/json")
+	request.Header.Add("token", responseLogin.AccessToken)
 	request.AddCookie(&http.Cookie{
 		Name:     "refresh_token",
 		Value:    token,

@@ -2,8 +2,12 @@ package helper_test
 
 import (
 	"ecommerce-cloning-app/internal/helper"
+	"encoding/base64"
 	"fmt"
 	_ "image/png"
+	"io"
+	"log"
+	"os"
 	"testing"
 	"time"
 )
@@ -72,4 +76,49 @@ func TestGetImage(t *testing.T) {
 	img := helper.GetImage(user.photo)
 
 	fmt.Println(img)
+}
+
+func TestUploadImage(t *testing.T) {
+	imagePath := "D:/dev/portofolio/ecommerce-cloning-app/assets/images/testImage/me.png"
+	fileImg, err := os.Open(imagePath)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer fileImg.Close()
+
+	imgData, errImg := io.ReadAll(fileImg)
+	if errImg != nil {
+		fmt.Println(errImg)
+	}
+
+	encodedImg := base64.StdEncoding.EncodeToString(imgData)
+	name, errUpload := helper.UploadPhotoProfile(encodedImg)
+	if errUpload != nil {
+		fmt.Println(errUpload)
+	}
+
+	fmt.Println(encodedImg)
+	fmt.Println(name)
+}
+
+func TestEncoded(t *testing.T) {
+	// Buka file gambar
+	file, err := os.Open("D:/dev/portofolio/ecommerce-cloning-app/assets/images/testImage/me.png")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	// Baca isi file gambar
+	imgData, err := io.ReadAll(file)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Encode ke format Base64
+	base64Str := base64.StdEncoding.EncodeToString(imgData)
+
+	// Cetak hasil encode
+	fmt.Println("Base64 Encoded Image:")
+	fmt.Println(base64Str)
 }

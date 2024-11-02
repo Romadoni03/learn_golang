@@ -67,14 +67,6 @@ func (handler *UserHandler) Logout(writer http.ResponseWriter, request *http.Req
 	}
 
 	http.SetCookie(writer, &http.Cookie{
-		Name:     "access_token",
-		Value:    "",
-		Expires:  time.Unix(0, 0),
-		HttpOnly: true,
-		Secure:   true,
-	})
-
-	http.SetCookie(writer, &http.Cookie{
 		Name:     "refresh_token",
 		Value:    "",
 		Expires:  time.Unix(0, 0),
@@ -97,11 +89,10 @@ func (handler *UserHandler) FindUser(writer http.ResponseWriter, request *http.R
 }
 
 func (handler *UserHandler) Update(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	token := request.Cookies()[1].Value
 	userUpdateRequest := dto.UserUpdateRequest{}
 	helper.ReadFromRequestBody(request, &userUpdateRequest)
 
-	userResponse := handler.UserService.Update(request.Context(), userUpdateRequest, token)
+	userResponse := handler.UserService.Update(request.Context(), userUpdateRequest)
 	webResponse := dto.WebResponse{
 		Code:   http.StatusOK,
 		Status: "OK",

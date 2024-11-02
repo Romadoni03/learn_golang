@@ -24,6 +24,7 @@ type UserService struct {
 
 func (service *UserService) Create(ctx context.Context, request dto.UserCreateRequest) string {
 	logger.Logging().Info("request from phone : " + request.NoTelepon + " call Create Func In Service")
+
 	err := service.Validate.Struct(request)
 	if err != nil {
 		logger.Logging().Error("Err :" + err.Error() + "username or password can not be null")
@@ -45,7 +46,7 @@ func (service *UserService) Create(ctx context.Context, request dto.UserCreateRe
 		NoTelepon:           request.NoTelepon,
 		Password:            helper.HashingPassword(request.Password),
 		Username:            helper.GeneratedUsername(),
-		LastUpdatedUsername: helper.GeneratedTimeNow(),
+		LastUpdatedUsername: time.Now().Local().Add(time.Hour * 720),
 		Name:                "",
 		Email:               "",
 		PhotoProfile:        "account_profile.png",
@@ -69,6 +70,7 @@ func (service *UserService) Create(ctx context.Context, request dto.UserCreateRe
 
 func (service *UserService) Login(ctx context.Context, request dto.UserCreateRequest) (dto.UserLoginResponse, string) {
 	logger.Logging().Info("request from phone : " + request.NoTelepon + " call Login Func In Service")
+
 	err := service.Validate.Struct(request)
 	if err != nil {
 		logger.Logging().Error("Err :" + err.Error() + "username or password can not be null")
@@ -102,6 +104,7 @@ func (service *UserService) Login(ctx context.Context, request dto.UserCreateReq
 		Token:          auth.GenerateRefreshToken(),
 		TokenExpiredAt: time.Now().Local().Add(time.Hour * 24),
 	}
+
 	tokenJWT, errToken := auth.GenerateJWT(user.NoTelepon)
 	if errToken != nil {
 		logger.Logging().Error("Failed set Token")
@@ -128,7 +131,7 @@ func (service *UserService) Logout(ctx context.Context, request *http.Request) s
 	helper.IfPanicError(err)
 	defer helper.CommitOrRollback(tx)
 
-	errLogout := service.UserRepository.DeleteToken(ctx, tx, refreshToken[1].Value)
+	errLogout := service.UserRepository.DeleteToken(ctx, tx, refreshToken[0].Value)
 	if errLogout != nil {
 		logger.Logging().Error("Err : " + errLogout.Error() + "failed to logout")
 		panic(exception.NewUnauthorizedError("failed to logout"))
@@ -142,60 +145,62 @@ func (service *UserService) FindUser(ctx context.Context, request *http.Request)
 	helper.IfPanicError(err)
 	defer helper.CommitOrRollback(tx)
 
-	var nameStore string
-	// var userProfile string
-
 	user, err := service.UserRepository.FindUser(ctx, tx, phone)
 	if err != nil {
 		logger.Logging().Error("Err : " + err.Error() + "user not found")
 		panic(exception.NewNotFoundError("user not found"))
 	}
-	if !user.Store.Name.Valid {
-		nameStore = ""
-	} else {
-		nameStore = user.Store.Name.String
-	}
 
+	logger.Logging().Info("photoname:" + user.PhotoProfile)
 	return dto.UserProfileResponse{
 		Username:     user.Username,
 		Name:         user.Name,
 		Email:        user.Email,
 		NoTelepon:    user.NoTelepon,
 		PhotoProfile: helper.GetImage(user.PhotoProfile),
-		NameStore:    nameStore,
+		NameStore:    user.Store.Name.String,
 		Gender:       user.Gender,
 		BirthDate:    user.BirthDate,
 	}
 }
 
-func (service *UserService) Update(ctx context.Context, request dto.UserUpdateRequest, token string) dto.UserProfileResponse {
+func (service *UserService) Update(ctx context.Context, request dto.UserUpdateRequest) dto.UserProfileResponse {
+	phone := ctx.Value("phone").(string)
 	tx, err := service.DB.Begin()
 	helper.IfPanicError(err)
 	defer helper.CommitOrRollback(tx)
 
-	user, errGetByToken := service.UserRepository.GetByToken(ctx, tx, token)
+	user, errGetByToken := service.UserRepository.FindUser(ctx, tx, phone)
 	if errGetByToken != nil {
-		logger.Logging().Error("Err : " + errGetByToken.Error() + "User by token not found")
+		logger.Logging().Error("Err : " + errGetByToken.Error() + "User not found")
 		panic(exception.NewNotFoundError("User by token not found"))
 	}
-	//Usernames can only be updated once every 30 days
-	userLastUsername := user.LastUpdatedUsername.UnixMilli()
 
-	if (userLastUsername + (1000 * 60 * 60 * 24 * 30)) > time.Now().Local().UnixMilli() {
-		logger.Logging().Error("can't update username before 30 days")
-		panic(exception.NewUnauthorizedError("can't update username before 30 days"))
+	if request.Username != "" {
+		if time.Now().Local().Before(user.LastUpdatedUsername) {
+			logger.Logging().Error("can't updated username berfore 30 days")
+			panic(exception.NewInternalServerError("can't updated username berfore 30 days"))
+		}
+		user.Username = request.Username
 	}
 
-	if user.Store.Name.String == "" {
+	photo, errPhoto := helper.UploadPhotoProfile(request.PhotoProfile)
+	if errPhoto != nil {
+		logger.Logging().Error("Err : " + errPhoto.Error())
+		panic(exception.NewNotFoundError(errPhoto.Error()))
+	}
+
+	if !user.Store.Name.Valid {
 		request.NameStore = ""
 	}
 	// set user
-	user.Username = request.Username
 	user.Name = request.Name
+	user.PhotoProfile = photo
 	user.Store.Name.String = request.NameStore
 	user.Gender = request.Gender
 	user.BirthDate = request.BirthDate
 	user.LastUpdatedUsername = helper.GeneratedTimeNow()
+
 	errUpdate := service.UserRepository.Update(ctx, tx, user)
 	if errUpdate != nil {
 		logger.Logging().Error("failed update user")
