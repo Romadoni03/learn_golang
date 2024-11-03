@@ -476,9 +476,7 @@
                         }
                     }
                 }
-            }
-        },
-        "/stores/profile": {
+            },
             "get": {
                 "tags": ["Store API"],
                 "description": "used to get profile store",

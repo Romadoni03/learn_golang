@@ -99,7 +99,7 @@ func TestDeleteStoreSuccess(t *testing.T) {
 	userRepository.Insert(context.Background(), tx, user)
 	tx.Commit()
 	serviceResponse, _ := userService.Login(context.Background(), dto.UserCreateRequest{NoTelepon: user.NoTelepon, Password: "rahasia"})
-	storeService.Create(context.Background(), dto.StoreCreateRequest{Name: "riski_taka_store"}, serviceResponse.Message)
+	storeService.Create(context.Background(), dto.StoreCreateRequest{Name: "riski_taka_store"})
 	router := setupRouter(db)
 
 	request := httptest.NewRequest(http.MethodDelete, "http://localhost:3000/api/stores", nil)
@@ -150,7 +150,7 @@ func TestFindByUser(t *testing.T) {
 	userRepository.Insert(context.Background(), tx, user)
 	tx.Commit()
 	serviceResponse, _ := userService.Login(context.Background(), dto.UserCreateRequest{NoTelepon: user.NoTelepon, Password: "rahasia"})
-	storeService.Create(context.Background(), dto.StoreCreateRequest{Name: "riski_taka_store"}, serviceResponse.Message)
+	storeService.Create(context.Background(), dto.StoreCreateRequest{Name: "riski_taka_store"})
 	router := setupRouter(db)
 
 	request := httptest.NewRequest(http.MethodGet, "http://localhost:3000/api/stores", nil)

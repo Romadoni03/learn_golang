@@ -14,11 +14,10 @@ type StoreHandler struct {
 }
 
 func (handler *StoreHandler) Create(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	token := request.Header.Get("API-KEY")
 	storeCreateRequest := dto.StoreCreateRequest{}
 	helper.ReadFromRequestBody(request, &storeCreateRequest)
 
-	result := handler.StoreService.Create(request.Context(), storeCreateRequest, token)
+	result := handler.StoreService.Create(request.Context(), storeCreateRequest)
 
 	webResponse := dto.WebResponse{
 		Code:   http.StatusOK,
@@ -30,9 +29,7 @@ func (handler *StoreHandler) Create(writer http.ResponseWriter, request *http.Re
 }
 
 func (handler *StoreHandler) Delete(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	token := request.Header.Get("API-KEY")
-
-	result := handler.StoreService.Delete(request.Context(), token)
+	result := handler.StoreService.Delete(request.Context())
 
 	webResponse := dto.WebResponse{
 		Code:   http.StatusOK,
@@ -44,9 +41,7 @@ func (handler *StoreHandler) Delete(writer http.ResponseWriter, request *http.Re
 }
 
 func (handler *StoreHandler) FindByUser(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	token := request.Header.Get("API-KEY")
-
-	result := handler.StoreService.FindByUser(request.Context(), token)
+	result := handler.StoreService.FindByUser(request.Context())
 
 	webResponse := dto.WebResponse{
 		Code:   http.StatusOK,
@@ -55,4 +50,10 @@ func (handler *StoreHandler) FindByUser(writer http.ResponseWriter, request *htt
 	}
 
 	helper.WriteToResponseBody(writer, webResponse)
+}
+
+func (handler *StoreHandler) Update(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	storeUpdateRequest := dto.StoreUpdateRequest{}
+	helper.ReadFromRequestBody(request, &storeUpdateRequest)
+
 }

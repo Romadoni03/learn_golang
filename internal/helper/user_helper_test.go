@@ -64,22 +64,13 @@ func TestExpiredAt(t *testing.T) {
 }
 
 func TestGetImage(t *testing.T) {
-	// Panggil fungsi GetImage
-
-	type userHelper struct {
-		photo string
-	}
-
-	user := userHelper{
-		photo: "account_profile.png",
-	}
-	img := helper.GetImage(user.photo)
+	img := helper.GetImage("bg.jpg")
 
 	fmt.Println(img)
 }
 
 func TestUploadImage(t *testing.T) {
-	imagePath := "D:/dev/portofolio/ecommerce-cloning-app/assets/images/testImage/me.png"
+	imagePath := "D:/dev/portofolio/ecommerce-cloning-app/assets/images/testImage/bg.jpg"
 	fileImg, err := os.Open(imagePath)
 	if err != nil {
 		fmt.Println(err)
@@ -103,7 +94,7 @@ func TestUploadImage(t *testing.T) {
 
 func TestEncoded(t *testing.T) {
 	// Buka file gambar
-	file, err := os.Open("D:/dev/portofolio/ecommerce-cloning-app/assets/images/testImage/me.png")
+	file, err := os.Open("D:/dev/portofolio/ecommerce-cloning-app/assets/images/photo_profile/1730622800_.png")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -120,5 +111,23 @@ func TestEncoded(t *testing.T) {
 
 	// Cetak hasil encode
 	fmt.Println("Base64 Encoded Image:")
+	fmt.Println(base64Str)
+}
+
+func TestCoba(t *testing.T) {
+	// Buka file gambar
+	file, err := os.Open("D:/dev/portofolio/ecommerce-cloning-app/assets/images/testImage/me.png")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	// Baca isi file gambar
+	imgData, err := io.ReadAll(file)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	base64Str := base64.StdEncoding.EncodeToString(imgData)
 	fmt.Println(base64Str)
 }

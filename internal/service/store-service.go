@@ -21,19 +21,23 @@ type StoreService struct {
 	Validate        *validator.Validate
 }
 
-func (service *StoreService) Create(ctx context.Context, request dto.StoreCreateRequest, token string) dto.StoreCreateResponse {
+func (service *StoreService) Create(ctx context.Context, request dto.StoreCreateRequest) dto.StoreCreateResponse {
 	logger.Logging().Info("Request from Store : " + request.Name + " call Create func in StoreService")
+	phone := ctx.Value("phone").(string)
 	errValidate := service.Validate.Struct(request)
-	helper.IfPanicError(errValidate)
+	if errValidate != nil {
+		logger.Logging().Error("Err :" + errValidate.Error())
+		panic(exception.NewValidationError(errValidate.Error()))
+	}
 
 	tx, errSQL := service.DB.Begin()
 	helper.IfPanicError(errSQL)
 	defer helper.CommitOrRollback(tx)
 
-	user, errCheckToken := service.UserRepository.FindFirstByToken(ctx, tx, token)
+	user, errCheckToken := service.UserRepository.FindUser(ctx, tx, phone)
 	if errCheckToken != nil {
-		logger.Logging().Error("Err :" + errCheckToken.Error() + "user whith token " + token + " is not found")
-		panic(exception.NewNotFoundError("user whith token " + token + " is not found"))
+		logger.Logging().Error("Err :" + errCheckToken.Error() + "user is not found")
+		panic(exception.NewNotFoundError("user is not found"))
 	}
 
 	store := entity.Store{
@@ -63,17 +67,29 @@ func (service *StoreService) Create(ctx context.Context, request dto.StoreCreate
 	return dto.StoreCreateResponse{Name: store.Name.String, Message: "Success create new store"}
 }
 
-func (service *StoreService) Delete(ctx context.Context, token string) dto.StoreCreateResponse {
+func (service *StoreService) Delete(ctx context.Context) dto.StoreCreateResponse {
+	phone := ctx.Value("phone").(string)
 	tx, errSQL := service.DB.Begin()
 	helper.IfPanicError(errSQL)
 	defer helper.CommitOrRollback(tx)
 
-	user, _ := service.UserRepository.FindFirstByToken(ctx, tx, token)
+	user, errFindUser := service.UserRepository.FindUser(ctx, tx, phone)
+	if errFindUser != nil {
+		logger.Logging().Error(errFindUser)
+		panic(exception.NewInternalServerError("user not found"))
+	}
 	logger.Logging().Info("Request from Store : " + user.Username + " call Delete func in StoreService")
 
-	storeResult, _ := service.StoreRepository.FindByUser(ctx, tx, user)
+	storeResult, errFindStore := service.StoreRepository.FindByUser(ctx, tx, user)
+	if errFindStore != nil {
+		logger.Logging().Error(errFindStore)
+		panic(exception.NewInternalServerError("store not found"))
+	}
 	err := service.StoreRepository.Delete(ctx, tx, storeResult)
-	helper.IfPanicError(err)
+	if err != nil {
+		logger.Logging().Error(err)
+		panic(exception.NewInternalServerError(err.Error()))
+	}
 
 	return dto.StoreCreateResponse{
 		Name:    storeResult.Name.String,
@@ -82,16 +98,24 @@ func (service *StoreService) Delete(ctx context.Context, token string) dto.Store
 
 }
 
-func (service *StoreService) FindByUser(ctx context.Context, token string) dto.StoreGetResponse {
+func (service *StoreService) FindByUser(ctx context.Context) dto.StoreGetResponse {
+	phone := ctx.Value("phone").(string)
 	tx, errSQL := service.DB.Begin()
 	helper.IfPanicError(errSQL)
 	defer helper.CommitOrRollback(tx)
 
-	user, _ := service.UserRepository.FindFirstByToken(ctx, tx, token)
+	user, errFindUser := service.UserRepository.FindUser(ctx, tx, phone)
+	if errFindUser != nil {
+		logger.Logging().Error(errFindUser)
+		panic(exception.NewInternalServerError("user not found"))
+	}
 	logger.Logging().Info("Request from Store : " + user.Username + " call FindByUser func in StoreService")
 
 	storeResult, err := service.StoreRepository.FindByUser(ctx, tx, user)
-	helper.IfPanicError(err)
+	if err != nil {
+		logger.Logging().Error(err)
+		panic(exception.NewInternalServerError("store not found"))
+	}
 
 	return dto.StoreGetResponse{
 		Id:          storeResult.StoreId,
@@ -101,4 +125,30 @@ func (service *StoreService) FindByUser(ctx context.Context, token string) dto.S
 		NoTelepon:   storeResult.NoTelepon,
 		Email:       user.Email,
 	}
+}
+
+func (service *StoreService) Update(ctx context.Context, request dto.StoreUpdateRequest) dto.StoreGetResponse {
+	logger.Logging().Info("Request from Store : " + request.Name + " call Update func in StoreService")
+	phone := ctx.Value("phone").(string)
+	errValidate := service.Validate.Struct(request)
+	helper.IfPanicError(errValidate)
+
+	tx, errSQL := service.DB.Begin()
+	helper.IfPanicError(errSQL)
+	defer helper.CommitOrRollback(tx)
+
+	user, errFindUser := service.UserRepository.FindUser(ctx, tx, phone)
+	if errFindUser != nil {
+		logger.Logging().Error(errFindUser)
+		panic(exception.NewInternalServerError("user not found"))
+	}
+	logger.Logging().Info("Request from Store : " + user.Username + " call Update func in StoreService")
+
+	_, err := service.StoreRepository.FindByUser(ctx, tx, user)
+	if err != nil {
+		logger.Logging().Error(err)
+		panic(exception.NewInternalServerError("store not found"))
+	}
+
+	return dto.StoreGetResponse{}
 }
