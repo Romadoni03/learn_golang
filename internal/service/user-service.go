@@ -26,17 +26,13 @@ func (service *UserService) Create(ctx context.Context, request dto.UserCreateRe
 	logger.Logging().Info("request from phone : " + request.NoTelepon + " call Create Func In Service")
 
 	err := service.Validate.Struct(request)
-	if err != nil {
-		logger.Logging().Error("Err :" + err.Error() + "username or password can not be null")
-		panic(exception.NewValidationError("username or password can not be null"))
-	}
+	exception.PanicValidationError(err, "username or password can not be null")
 
-	tx, err := service.DB.Begin()
-	helper.IfPanicError(err)
+	tx, errDB := service.DB.Begin()
+	exception.PanicInternalServerError(errDB, "failed connection")
 	defer helper.CommitOrRollback(tx)
 
 	_, errCheck := service.UserRepository.FindByPhone(ctx, tx, request.NoTelepon)
-
 	if errCheck == nil {
 		logger.Logging().Error("user is already")
 		panic(exception.NewInternalServerError("user is already"))
@@ -59,33 +55,23 @@ func (service *UserService) Create(ctx context.Context, request dto.UserCreateRe
 	}
 
 	errService := service.UserRepository.Insert(ctx, tx, user)
-	if errService != nil {
-		logger.Logging().Error(errService)
-		panic(exception.NewInternalServerError("failed to create new user"))
-	}
+	exception.PanicInternalServerError(errService, "failed to create new user")
 
 	return "success create new user"
-
 }
 
 func (service *UserService) Login(ctx context.Context, request dto.UserCreateRequest) (dto.UserLoginResponse, string) {
 	logger.Logging().Info("request from phone : " + request.NoTelepon + " call Login Func In Service")
 
 	err := service.Validate.Struct(request)
-	if err != nil {
-		logger.Logging().Error("Err :" + err.Error() + "username or password can not be null")
-		panic(exception.NewValidationError("username or password can not be null"))
-	}
+	exception.PanicValidationError(err, "username or password can not be null")
 
 	tx, err := service.DB.Begin()
-	helper.IfPanicError(err)
+	exception.PanicInternalServerError(err, "failed connection")
 	defer helper.CommitOrRollback(tx)
 
 	data, errCheck := service.UserRepository.FindByPhone(ctx, tx, request.NoTelepon)
-	if errCheck != nil {
-		logger.Logging().Error("username or password is wrong")
-		panic(exception.NewUnauthorizedError("username or password is wrong"))
-	}
+	exception.PanicUnauthorizedError(errCheck, "username or password is wrong")
 
 	if data.Token != "" {
 		logger.Logging().Error(data.NoTelepon + " already login")
@@ -93,10 +79,7 @@ func (service *UserService) Login(ctx context.Context, request dto.UserCreateReq
 	}
 
 	errCheckPw := helper.CompiringPassword(data.Password, request.Password)
-	if errCheckPw != nil {
-		logger.Logging().Error("username or password is wrong")
-		panic(exception.NewUnauthorizedError("username or password is wrong"))
-	}
+	exception.PanicUnauthorizedError(errCheckPw, "username or password is wrong")
 
 	user := entity.User{
 		Username:       data.Username,
@@ -106,16 +89,10 @@ func (service *UserService) Login(ctx context.Context, request dto.UserCreateReq
 	}
 
 	tokenJWT, errToken := auth.GenerateJWT(user.NoTelepon)
-	if errToken != nil {
-		logger.Logging().Error("Failed set Token")
-		panic(exception.NewUnauthorizedError("failed set token"))
-	}
+	exception.PanicUnauthorizedError(errToken, "failed set token")
 
 	errUpdateToken := service.UserRepository.UpdateToken(ctx, tx, user)
-	if errUpdateToken != nil {
-		logger.Logging().Error("Failed set Token")
-		panic(exception.NewUnauthorizedError("failed set token"))
-	}
+	exception.PanicUnauthorizedError(errUpdateToken, "failed set token")
 
 	return dto.UserLoginResponse{
 		Message:     "Login Success",

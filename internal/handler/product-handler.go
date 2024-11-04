@@ -15,11 +15,11 @@ type ProductHandler struct {
 }
 
 func (handler *ProductHandler) Create(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	token := request.Header.Get("API-KEY")
+	phone := request.Context().Value("phone").(string)
 	productRequest := dto.ProductCreateUpdateRequest{}
 	helper.ReadFromRequestBody(request, &productRequest)
 
-	productResponse := handler.ProductService.Create(request.Context(), productRequest, token)
+	productResponse := handler.ProductService.Create(request.Context(), productRequest, phone)
 	logger.LogHandler(request).Info(productResponse)
 	webResponse := dto.WebResponse{
 		Code:   http.StatusOK,
@@ -31,9 +31,9 @@ func (handler *ProductHandler) Create(writer http.ResponseWriter, request *http.
 }
 
 func (handler *ProductHandler) FindAll(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	token := request.Header.Get("API-KEY")
+	phone := request.Context().Value("phone").(string)
 
-	productResponses := handler.ProductService.FindAll(request.Context(), token)
+	productResponses := handler.ProductService.FindAll(request.Context(), phone)
 	webResponse := dto.WebResponse{
 		Code:   http.StatusOK,
 		Status: "OK",
@@ -58,11 +58,11 @@ func (handler *ProductHandler) FindById(writer http.ResponseWriter, request *htt
 
 func (handler *ProductHandler) Update(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	productId := params.ByName("productId")
-	token := request.Header.Get("API-KEY")
+	phone := request.Context().Value("phone").(string)
 	productRequest := dto.ProductCreateUpdateRequest{}
 	helper.ReadFromRequestBody(request, &productRequest)
 
-	productResponse := handler.ProductService.Update(request.Context(), productRequest, productId, token)
+	productResponse := handler.ProductService.Update(request.Context(), productRequest, productId, phone)
 	webResponse := dto.WebResponse{
 		Code:   http.StatusOK,
 		Status: "OK",
@@ -74,9 +74,9 @@ func (handler *ProductHandler) Update(writer http.ResponseWriter, request *http.
 
 func (handler *ProductHandler) Delete(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	productId := params.ByName("productId")
-	token := request.Header.Get("API-KEY")
+	phone := request.Context().Value("phone").(string)
 
-	productResponse := handler.ProductService.Delete(request.Context(), productId, token)
+	productResponse := handler.ProductService.Delete(request.Context(), productId, phone)
 	webResponse := dto.WebResponse{
 		Code:   http.StatusOK,
 		Status: "OK",

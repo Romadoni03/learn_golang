@@ -4,7 +4,6 @@ import "github.com/shopspring/decimal"
 
 type ProductCreateUpdateResponse struct {
 	Id                string          `validate:"required" json:"id"`
-	PhotoProduct      string          `validate:"required" json:"photo"`
 	Name              string          `validate:"required" json:"name"`
 	Category          string          `validate:"required" json:"category"`
 	Description       string          `validate:"required" json:"description"`
@@ -17,4 +16,5 @@ type ProductCreateUpdateResponse struct {
 	Conditions        string          `validate:"required" json:"condition"`
 	PreOrder          string          `validate:"required" json:"pre_order"`
 	Status            string          `validate:"required" json:"status"`
+	PhotoProduct      string          `validate:"required" json:"photo"`
 }

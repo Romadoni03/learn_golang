@@ -56,4 +56,14 @@ func (handler *StoreHandler) Update(writer http.ResponseWriter, request *http.Re
 	storeUpdateRequest := dto.StoreUpdateRequest{}
 	helper.ReadFromRequestBody(request, &storeUpdateRequest)
 
+	result := handler.StoreService.Update(request.Context(), storeUpdateRequest)
+
+	webResponse := dto.WebResponse{
+		Code:   http.StatusOK,
+		Status: "OK",
+		Data:   result,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+
 }

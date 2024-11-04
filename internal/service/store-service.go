@@ -9,6 +9,7 @@ import (
 	"ecommerce-cloning-app/internal/helper"
 	"ecommerce-cloning-app/internal/logger"
 	"ecommerce-cloning-app/internal/repository"
+	"time"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
@@ -131,24 +132,38 @@ func (service *StoreService) Update(ctx context.Context, request dto.StoreUpdate
 	logger.Logging().Info("Request from Store : " + request.Name + " call Update func in StoreService")
 	phone := ctx.Value("phone").(string)
 	errValidate := service.Validate.Struct(request)
-	helper.IfPanicError(errValidate)
+	exception.PanicValidationError(errValidate, "can not be null")
 
 	tx, errSQL := service.DB.Begin()
-	helper.IfPanicError(errSQL)
+	exception.PanicInternalServerError(errSQL, "failed connection")
 	defer helper.CommitOrRollback(tx)
 
 	user, errFindUser := service.UserRepository.FindUser(ctx, tx, phone)
-	if errFindUser != nil {
-		logger.Logging().Error(errFindUser)
-		panic(exception.NewInternalServerError("user not found"))
-	}
+	exception.PanicInternalServerError(errFindUser, "user not found")
 	logger.Logging().Info("Request from Store : " + user.Username + " call Update func in StoreService")
 
-	_, err := service.StoreRepository.FindByUser(ctx, tx, user)
-	if err != nil {
-		logger.Logging().Error(err)
-		panic(exception.NewInternalServerError("store not found"))
-	}
+	store, err := service.StoreRepository.FindByUser(ctx, tx, user)
+	exception.PanicInternalServerError(err, "store not found")
 
-	return dto.StoreGetResponse{}
+	if request.Name != "" {
+		if time.Now().Local().Before(store.LastUpdatedName) {
+			logger.Logging().Error("cant updated store's name")
+			panic(exception.NewInternalServerError("cant updated store's name"))
+		}
+	}
+	logoName, errLogo := helper.UploadLogoStore(request.Logo)
+	exception.PanicInternalServerError(errLogo, "faild save logo")
+	store.Name.String = request.Name
+	store.Description = request.Description
+	store.Logo = logoName
+
+	errUpdate := service.StoreRepository.Update(ctx, tx, store)
+	exception.PanicInternalServerError(errUpdate, "failed update store")
+
+	return dto.StoreGetResponse{
+		Id:          store.StoreId,
+		Name:        store.Name.String,
+		Logo:        request.Logo,
+		Description: store.Description,
+	}
 }

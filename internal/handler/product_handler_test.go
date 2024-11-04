@@ -54,7 +54,7 @@ func TestAddProductSuccess(t *testing.T) {
 	userRepository.Insert(context.Background(), tx, user)
 	tx.Commit()
 	serviceResponse, _ := userService.Login(context.Background(), dto.UserCreateRequest{NoTelepon: user.NoTelepon, Password: "rahasia"})
-	storeService.Create(context.Background(), dto.StoreCreateRequest{Name: "Riski Store"}, serviceResponse.Message)
+	storeService.Create(context.Background(), dto.StoreCreateRequest{Name: "Riski Store"})
 	router := setupRouter(db)
 
 	product := dto.ProductCreateUpdateRequest{
@@ -127,7 +127,7 @@ func TestGetAllProductSuccess(t *testing.T) {
 	userRepository.Insert(context.Background(), tx, user)
 	tx.Commit()
 	serviceResponse, _ := userService.Login(context.Background(), dto.UserCreateRequest{NoTelepon: user.NoTelepon, Password: "rahasia"})
-	storeService.Create(context.Background(), dto.StoreCreateRequest{Name: "Riski Store"}, serviceResponse.Message)
+	storeService.Create(context.Background(), dto.StoreCreateRequest{Name: "Riski Store"})
 
 	product := dto.ProductCreateUpdateRequest{
 		PhotoProduct:      "test_foto.jpg",
@@ -216,7 +216,7 @@ func TestGetByIdProductSuccess(t *testing.T) {
 	userRepository.Insert(context.Background(), tx, user)
 	tx.Commit()
 	serviceResponse, _ := userService.Login(context.Background(), dto.UserCreateRequest{NoTelepon: user.NoTelepon, Password: "rahasia"})
-	storeService.Create(context.Background(), dto.StoreCreateRequest{Name: "Riski Store"}, serviceResponse.Message)
+	storeService.Create(context.Background(), dto.StoreCreateRequest{Name: "Riski Store"})
 
 	product := dto.ProductCreateUpdateRequest{
 		PhotoProduct:      "test_foto.jpg",
@@ -290,7 +290,7 @@ func TestUpdateProductSuccess(t *testing.T) {
 	userRepository.Insert(context.Background(), tx, user)
 	tx.Commit()
 	serviceResponse, _ := userService.Login(context.Background(), dto.UserCreateRequest{NoTelepon: user.NoTelepon, Password: "rahasia"})
-	storeService.Create(context.Background(), dto.StoreCreateRequest{Name: "Riski Store"}, serviceResponse.Message)
+	storeService.Create(context.Background(), dto.StoreCreateRequest{Name: "Riski Store"})
 
 	product := dto.ProductCreateUpdateRequest{
 		PhotoProduct:      "test_foto.jpg",
@@ -383,7 +383,7 @@ func TestDeleteProductSuccess(t *testing.T) {
 	userRepository.Insert(context.Background(), tx, user)
 	tx.Commit()
 	serviceResponse, _ := userService.Login(context.Background(), dto.UserCreateRequest{NoTelepon: user.NoTelepon, Password: "rahasia"})
-	storeService.Create(context.Background(), dto.StoreCreateRequest{Name: "Riski Store"}, serviceResponse.Message)
+	storeService.Create(context.Background(), dto.StoreCreateRequest{Name: "Riski Store"})
 
 	product := dto.ProductCreateUpdateRequest{
 		PhotoProduct:      "test_foto.jpg",

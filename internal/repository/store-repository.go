@@ -70,3 +70,33 @@ func (repository *StoreRepository) FindByUser(ctx context.Context, tx *sql.Tx, u
 		return store, errors.New("store not found")
 	}
 }
+
+func (repository *StoreRepository) Update(ctx context.Context, tx *sql.Tx, store entity.Store) error {
+	SQL := "UPDATE stores SET name = ?, description = ?, logo = ? where store_id = ?"
+
+	_, err := tx.ExecContext(ctx, SQL, store.Name, store.Description, store.Logo, store.StoreId)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (repository *StoreRepository) FindByPhone(ctx context.Context, tx *sql.Tx, phone string) (entity.Store, error) {
+	SQL := "select store_id, no_telepon, name, last_updated_name, logo, description, status, link_store, total_comment, total_following, total_follower, total_product, conditions, created_at from stores where no_telepon = ?"
+
+	rows, err := tx.QueryContext(ctx, SQL, phone)
+	helper.IfPanicError(err)
+	defer rows.Close()
+
+	store := entity.Store{}
+
+	if rows.Next() {
+		errNext := rows.Scan(&store.StoreId, &store.NoTelepon, &store.Name, &store.LastUpdatedName, &store.Logo, &store.Description, &store.Status, &store.LinkStore, &store.TotalComment, &store.TotalFollowing, &store.TotalFollower, &store.TotalProduct, &store.Condition, &store.CreatedAt)
+		helper.IfPanicError(errNext)
+
+		return store, nil
+	} else {
+		return store, errors.New("store not found")
+	}
+}
