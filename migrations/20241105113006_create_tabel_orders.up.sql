@@ -7,5 +7,5 @@ CREATE TABLE orders
     created_at DATETIME NOT NULL,
     updated_at TIMESTAMP,
     PRIMARY KEY(id),
-    FOREIGN KEY fk_users_orders(user_phone) REFERENCES users (no_telepon)
+    FOREIGN KEY fk_user_orders(user_phone) REFERENCES users (no_telepon)
 )ENGINE=InnoDB;
