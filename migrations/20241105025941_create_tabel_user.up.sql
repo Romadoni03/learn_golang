@@ -11,7 +11,7 @@ CREATE TABLE users
     gender VARCHAR(20),
     status_member VARCHAR(200),
     birth_date VARCHAR(200),
-    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    created_at DATETIME NOT NULL,
     token VARCHAR(255),
     token_expired_at DATETIME,
     PRIMARY KEY(no_telepon)

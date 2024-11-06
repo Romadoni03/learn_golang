@@ -15,8 +15,8 @@ CREATE TABLE products
     conditions VARCHAR(255) NOT NULL,
     pre_order VARCHAR(200) NOT NULL,
     status VARCHAR(200) NOT NULL,
-    created_at TIMESTAMP NOT NULL,
-    last_updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP,
+    created_at DATETIME NOT NULL,
+    last_updated_at TIMESTAMP,
     PRIMARY KEY(id),
     FOREIGN KEY fk_stores_products(store_id) REFERENCES Stores(store_id)
 )ENGINE=InnoDB;

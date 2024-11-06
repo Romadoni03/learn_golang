@@ -13,7 +13,7 @@ CREATE TABLE stores
     total_follower INT(4),
     total_product INT (4),
     conditions VARCHAR(200),
-    created_at TIMESTAMP NOT NULL,
+    created_at DATETIME NOT NULL,
     PRIMARY KEY(store_id),
     Foreign Key fk_users_stores(no_telepon) REFERENCES users (no_telepon)
 )ENGINE=InnoDB;
