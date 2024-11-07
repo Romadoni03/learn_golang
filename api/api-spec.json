@@ -918,7 +918,35 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                
+                                "type": "object",
+                                "properties": {
+                                    "user_phone":{
+                                        "type": "string"
+                                    },
+                                    "products":{
+                                        "type": "array",
+                                        "items":{
+                                            "type": "object",
+                                            "properties": {
+                                                "product_id":{
+                                                    "type": "string"
+                                                },
+                                                "quatity":{
+                                                    "type": "integer"
+                                                },
+                                                "price_unit":{
+                                                    "type": "number"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "shipping_address":{
+                                        "type": "object",
+                                        "properties": {
+                                            "s"
+                                        }
+                                    }
+                                }
                             }
                         }
                     }

@@ -2,7 +2,7 @@ CREATE TABLE shipping
 (
     id VARCHAR(255) NOT NULL,
     order_id VARCHAR(255) NOT NULL,
-    shipping_address TEXT NOT NULL,
+    street TEXT NOT NULL,
     city VARCHAR(100) NOT NULL,
     postal_code INT(8) NOT NULL,
     province VARCHAR(100) NOT NULL,
